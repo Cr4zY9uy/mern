@@ -1,0 +1,96 @@
+header {
+    display: flex;
+    position: sticky;
+    top: 0;
+    z-index: 12;
+    background-color: rgb(255, 255, 255);
+    height: 10vh;
+}
+
+.headers {
+    display: flex;
+    position: sticky;
+    top: 0;
+    z-index: 12;
+    background-color: rgb(255, 255, 255);
+    height: 10vh;
+    align-items: center;
+}
+
+
+.headers a {
+    text-decoration: none;
+    text-transform: uppercase;
+    color: rgba(0, 0, 0, 0.873);
+    letter-spacing: 0.1rem;
+    margin: 0px 15px;
+    font-size: 16px;
+
+}
+
+.headers a:first-child {
+    margin-left: 0;
+}
+
+.header-logo {
+    width: 15%;
+    height: 100%;
+}
+
+.header-logo img {
+    height: 50px;
+
+}
+
+.header-link {
+    width: 70%;
+    text-align: center;
+    line-height: 16px;
+}
+
+.header-icon {
+    width: 15%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.header-icon button {
+    border: none;
+    background-color: white;
+    margin: 0px 20px;
+
+}
+
+.header-icon button:first-child {
+    margin-left: 0px;
+}
+
+.header-icon button:first-child {
+    position: relative;
+}
+
+.header-icon .qty {
+    border: 0.1px solid rgb(217, 161, 163);
+    border-radius: 50%;
+    font-size: 11px;
+    font-weight: 600;
+    color: rgb(217, 161, 163);
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    text-align: center;
+    line-height: 19px;
+    right: 55px;
+    top: 10px;
+}
+
+.headers button i {
+    font-size: 20px;
+
+}
+
+.headers .wrap_search_modal {
+    width: 1300px;
+    height: 500px;
+}

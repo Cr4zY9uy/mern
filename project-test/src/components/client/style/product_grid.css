@@ -1,0 +1,42 @@
+.searchResult {
+    padding-bottom: 50px;
+}
+
+.searchResult .search_item img {
+    width: 100%;
+}
+
+.searchResult .search_item p {
+    line-height: 7px;
+}
+
+.searchResult .search_item button {
+    width: 60%;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.searchResult span,
+.searchResult p {
+    font-weight: 600;
+}
+
+.searchResult span {
+    color: rgba(128, 128, 128, 0.607);
+    font-size: 18px;
+    margin-left: 10px;
+}
+
+.searchResult p {
+    color: rgb(241, 28, 28);
+    font-size: 20px;
+}
+
+.searchResult h4 {
+    margin-bottom: 20px;
+    font-weight: 400;
+}
+
+.searchResult .discount {
+    text-decoration: line-through;
+}
