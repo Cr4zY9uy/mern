@@ -1,4 +1,5 @@
 import './App.css';
+import 'react-notifications-component/dist/theme.css'
 import Login from './components/admin/page/login';
 import { Route, Routes, useLocation } from 'react-router';
 import Admin from './components/admin/page/home';
@@ -13,26 +14,35 @@ import Navbar from './components/admin/layout/navbar';
 import Product_List from './components/admin/page/product_list';
 import Category_List from './components/admin/page/category_list';
 import Order_List from './components/admin/page/order_list';
-function App() {
+import { useState } from 'react';
+import { connect } from 'react-redux';
+import { ReactNotifications } from 'react-notifications-component'
+function App(props) {
   const location = useLocation();
-  const hide = location.pathname === '/login';
+  const hide = location.pathname === '/';
+  const currentUser = props.state.currentUser.name;
+  const [navbarCollapsed, setNavbarCollapsed] = useState(false);
+  const handleNavbarCollapse = (collapsed) => {
+    setNavbarCollapsed(collapsed);
+  };
+
   return (
     <>
       <div className='d-flex'>
-        {!hide && <Navbar />}
+        {!hide && <Navbar collapsed={navbarCollapsed} />}
         <div className='d-flex flex-column wrap_main'>
-          {!hide && <Header />}
-
+          {!hide && <Header onToggleCollapsed={handleNavbarCollapse} />}
+          <ReactNotifications />
           <Routes>
-            <Route path='/login' element={<Login />} />
-            <Route path='/' element={<Admin />} />
+            <Route path='/' element={<Login />} />
+            <Route path='/admin' element={<Admin />} />
             <Route path='/product' element={<Product_List />} />
             <Route path='/category' element={<Category_List />} />
-            <Route path='/order/edit' element={<EditOrder />} />
+            <Route path='/order/edit/:id' element={<EditOrder />} />
             <Route path='/product/add' element={<AddProduct />} />
             <Route path='/category/add' element={<AddCategory />} />
-            <Route path='/product/edit' element={<EditProduct />} />
-            <Route path='/category/edit' element={<EditCategory />} />
+            <Route path='/product/edit/:id' element={<EditProduct />} />
+            <Route path='/category/edit/:id' element={<EditCategory />} />
             <Route path='/order' element={<Order_List />} />
           </Routes>
           {!hide && <Copyright />}
@@ -42,4 +52,9 @@ function App() {
   );
 }
 
-export default App;
+const mapStateToProps = (state, ownProps) => {
+  return {
+    state: state.user_reducer
+  }
+}
+export default connect(mapStateToProps, null)(App);

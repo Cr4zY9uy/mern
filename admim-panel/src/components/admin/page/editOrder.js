@@ -19,23 +19,8 @@ import { useState } from "react";
 import Popover_Input from "../layout/popover_input";
 import Popover_Select from "../layout/popover_select";
 function EditOrder() {
-    const formItemLayout = {
-        labelCol: {
-            xs: { span: 30 },
-            sm: { span: 6 },
-        },
-        wrapperCol: {
-            xs: { span: 24 },
-            sm: { span: 14 },
-        },
-    };
-    const normFile = (e) => {
-        console.log('Upload event:', e);
-        if (Array.isArray(e)) {
-            return e;
-        }
-        return e?.fileList;
-    };
+    const [input, handleInput] = useState({});
+    
     return (
         <div className="edit_order_panel container">
             <h2 className='caption'><FormOutlined />Order detail</h2>
@@ -44,7 +29,6 @@ function EditOrder() {
                 bordered={false}
             >
                 <Form>
-
                     <Flex justify="space-between" gap="middle">
                         <Table bordered hover size="lg">
                             <tbody>

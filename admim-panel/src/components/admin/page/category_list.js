@@ -8,30 +8,106 @@ import { FormOutlined } from '@ant-design/icons';
 import { Cloudinary } from '@cloudinary/url-gen';
 import { fill } from '@cloudinary/url-gen/actions/resize';
 import { AdvancedImage } from '@cloudinary/react';
+import { delete_category_all, list_category } from '../../../services/category_service';
+import { useEffect, useState } from 'react';
+import { Store } from 'react-notifications-component';
+import Delete_Modal from '../layout/modal';
 function Category_List() {
+    const [type, setType] = useState("");
+    const [category, setCategory] = useState([]);
+    const navigate = useNavigate();
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const cate_list = async () => {
+        try {
+            const rs = await list_category();
+            setCategory(rs.data.category_list);
+            if (rs.status !== 200) {
+                console.log(rs.statusText)
+            }
+        } catch (err) {
+            if (err.response) {
+                console.log(err.response.status);
+            }
+        }
+    }
+    const delete_all = async () => {
+        const res = await delete_category_all();
+        if (res.status === 200) {
+            Store.addNotification({
+                title: "Sucess!!",
+                message: "You delete all categories successfully!",
+                type: "success",
+                insert: "top",
+                container: "top-right",
+                animationIn: ["animate__animated", "animate__fadeIn"],
+                animationOut: ["animate__animated", "animate__fadeOut"],
+                dismiss: {
+                    duration: 1500,
+                    onScreen: true
+                }
+            });
+        }
+        else {
+            Store.addNotification({
+                title: "Failure!!",
+                message: "You delete all categories unsuccessfully!",
+                type: "danger",
+                insert: "top",
+                container: "top-right",
+                animationIn: ["animate__animated", "animate__fadeIn"],
+                animationOut: ["animate__animated", "animate__fadeOut"],
+                dismiss: {
+                    duration: 1500,
+                    onScreen: true
+                }
+            });
+        }
+    }
+    useEffect(() => {
+        cate_list();
+        setType("category")
+    }, [])
+    const showModal = () => {
+        setIsModalOpen(!isModalOpen);
+    };
+    const handleModalOk = () => {
+        setIsModalOpen(false);
+    };
+
+    const handleModalCancel = () => {
+        setIsModalOpen(false);
+    };
+    const handleCheckboxChange = () => {
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+        let count = 0;
+        for (var i = 0; i < checkboxes.length; i++) {
+            if (checkboxes[i].checked === true) {
+                count++;
+            }
+        }
+        return !(count === checkboxes.length);
+    }
     const cld = new Cloudinary({
         cloud: {
             cloudName: 'dv7ni8uod'
         }
     });
-    const myImage = cld.image('shop/xpnsepyssnwwueukiq6x');
-    myImage.resize(fill().width(250).height(250));
-    const navigate = useNavigate();
     return (
         <div className="container category_list">
             <h2 className='caption'><MenuUnfoldOutlined style={{ paddingRight: "6px" }} />Category list</h2>
             <Table bordered hover responsive="lg">
-
                 <thead>
-
                     <tr>
                         <th colSpan={2} className='wrap_delete'>
                             <div className='d-flex'>
                                 <div className='wrap' onClick={checkParent}>
-                                    <div className='wrap_parent d-flex align-items-center'><input type='checkbox' className='parent' /></div>
+                                    <div className='wrap_parent d-flex align-items-center'><input type='checkbox' className='parent' onClick={checkParent} /></div>
                                 </div>
                                 <div className="del">
-                                    <Button variant='danger'><i class="bi bi-trash-fill"></i></Button>
+                                    <Button variant='danger'
+
+                                        onClick={delete_all}
+                                    ><i class="bi bi-trash-fill"></i></Button>
                                 </div>
                             </div>
                         </th>
@@ -44,65 +120,34 @@ function Category_List() {
                         <th>ID</th>
                         <th>Name</th>
                         <th>Image</th>
-                        <th>Sort</th>
                         <th>Description</th>
                         <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td><input type='checkbox' className='child' /></td>
-                        <td>1</td>
-                        <td>Otto</td>
-                        <td>
-                            <AdvancedImage cldImg={myImage} />
-                        </td>
-                        <td>1</td>
-                        <td>Generating random paragraphs can be an excellent way for writers to get their creative flow going at the beginning of the day. The writer has no idea what topic the random paragraph will be about when it appears. </td>
-                        <td>
-                            <Button variant='danger' style={{ marginRight: "10px" }}><i class="bi bi-trash-fill"></i></Button>
-                            <Button variant='warning' onClick={() => { navigate("/category/edit") }}><FormOutlined /></Button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><input type='checkbox' className='child' /></td>
-                        <td>1</td>
-                        <td>Otto</td>
-                        <td><img src='./images/fruits/apple1.png' alt='apple' /></td>
-                        <td>1</td>
-                        <td>Generating random paragraphs can be an excellent way for writers to get their creative flow going at the beginning of the day. The writer has no idea what topic the random paragraph will be about when it appears. </td>
-                        <td>
-                            <Button variant='danger' style={{ marginRight: "10px" }}><i class="bi bi-trash-fill"></i></Button>
-                            <Button variant='warning'><i class="bi bi-pencil-square"></i></Button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><input type='checkbox' className='child' /></td>
-                        <td>1</td>
-                        <td>Otto</td>
-                        <td><img src='./images/fruits/apple1.png' alt='apple' /></td>
-                        <td>1</td>
-                        <td>Generating random paragraphs can be an excellent way for writers to get their creative flow going at the beginning of the day. The writer has no idea what topic the random paragraph will be about when it appears. </td>
-                        <td>
-                            <Button variant='danger' style={{ marginRight: "10px" }}><i class="bi bi-trash-fill"></i></Button>
-                            <Button variant='warning'><FormOutlined onClick={() => { navigate('/category/edit') }} /></Button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><input type='checkbox' className='child' /></td>
-                        <td>1</td>
-                        <td>Otto</td>
-                        <td><img src='./images/fruits/apple1.png' alt='apple' /></td>
-                        <td>1</td>
-                        <td>Generating random paragraphs can be an excellent way for writers to get their creative flow going at the beginning of the day. The writer has no idea what topic the random paragraph will be about when it appears. </td>
-                        <td>
-                            <Button variant='danger' style={{ marginRight: "10px" }}><i class="bi bi-trash-fill"></i></Button>
-                            <Button variant='warning'><i class="bi bi-pencil-square"></i></Button>
-                        </td>
-                    </tr>
+                    {category?.map((item) => {
+                        return (
+
+                            <tr key={item.category_id}>
+                                <td><input type='checkbox' className='child' /></td>
+                                <td>{item.category_id}</td>
+                                <td>{item.name}</td>
+                                <td>
+                                    <AdvancedImage cldImg={cld.image(item.image).resize(fill().width(100).height(100))} />
+                                </td>
+                                <td>{item.description}</td>
+                                <td>
+                                    <Button variant='danger' style={{ marginRight: "10px" }} onClick={showModal}><i class="bi bi-trash-fill"></i></Button>
+                                    <Button variant='warning' onClick={() => { navigate(`/category/edit/${item.category_id}`) }}><FormOutlined /></Button>
+                                </td>
+                                <Delete_Modal status={isModalOpen} onOk={handleModalOk} onCancel={handleModalCancel} type_del={type} id_del={item.category_id} />
+                            </tr>
+                        )
+                    })}
+
                 </tbody>
             </Table>
-        </div>
+        </div >
     );
 }
 export default Category_List;

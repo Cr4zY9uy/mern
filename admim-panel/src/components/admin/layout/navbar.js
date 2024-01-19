@@ -9,7 +9,6 @@ import {
     UsergroupDeleteOutlined,
 } from '@ant-design/icons';
 import { Menu, ConfigProvider, Layout } from 'antd';
-import { useState } from "react";
 function getItem(label, key, icon, children, type) {
     return {
         key,
@@ -19,9 +18,8 @@ function getItem(label, key, icon, children, type) {
         type,
     };
 }
-function Navbar(props) {
+function Navbar({ collapsed }) {
     const { Sider } = Layout;
-    const collapsed = false;
     const items = [
         getItem('Product & Category', '1', <FolderOpenOutlined />, [
             getItem(<NavLink to={"/category"}>Category</NavLink>, '2', <FolderOutlined />),
@@ -46,7 +44,6 @@ function Navbar(props) {
                 <Menu
                     mode="inline"
                     theme="light"
-
                     items={items}
                 />
             </Sider>

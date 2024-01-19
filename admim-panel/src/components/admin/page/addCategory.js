@@ -11,13 +11,15 @@ import {
     Button,
     Space
 } from 'antd';
-import { useEffect, useState } from "react";
+import { Store } from 'react-notifications-component';
+import { useState } from "react";
 import { useNavigate } from "react-router";
 import { add_category } from "../../../services/category_service";
 function AddCategory() {
     const navigate = useNavigate();
     const [data, setData] = useState({});
     const [image, setImage] = useState("");
+
     const formItemLayout = {
         labelCol: {
             xs: { span: 30 },
@@ -28,16 +30,44 @@ function AddCategory() {
             sm: { span: 14 },
         },
     };
-
     const handleInput = (e) => {
         setData({ ...data, [e.target.name]: e.target.value });
     }
     const handleSubmit = async (e) => {
         e.preventDefault();
-
         try {
             const res = await add_category({ ...data, image });
-            console.log(res);
+            if (res.status === 201) {
+                Store.addNotification({
+                    title: "Sucess!!",
+                    message: "You add a category successfully!",
+                    type: "success",
+                    insert: "top",
+                    container: "top-center",
+                    animationIn: ["animate__animated", "animate__fadeIn"],
+                    animationOut: ["animate__animated", "animate__fadeOut"],
+                    dismiss: {
+                        duration: 2000,
+                        onScreen: true
+                    }
+                });
+                navigate("/category")
+            }
+            else {
+                Store.addNotification({
+                    title: "Failure!!",
+                    message: "You add a category unsuccessfully!",
+                    type: "danger",
+                    insert: "top",
+                    container: "top-center",
+                    animationIn: ["animate__animated", "animate__fadeIn"],
+                    animationOut: ["animate__animated", "animate__fadeOut"],
+                    dismiss: {
+                        duration: 2000,
+                        onScreen: true
+                    }
+                });
+            }
         } catch (error) {
             if (error.response) {
                 console.log(error.response.status);
@@ -54,10 +84,8 @@ function AddCategory() {
     const handleImage = (file) => {
         const reader = new FileReader();
         reader.onload = (e) => {
-            console.log(e.target.result);
-            setImage(e.target.result.replace(/(\r\n|\n|\r)/gm, ""));
+            setImage(e.target.result);
         };
-        console.log(URL.createObjectURL(file));
         reader.readAsDataURL(file);
         return false;
     };
@@ -114,7 +142,7 @@ function AddCategory() {
                             <Button type="primary" htmlType="submit">
                                 Submit
                             </Button>
-                            <Button htmlType="reset">reset</Button>
+                            <Button htmlType="reset">Reset</Button>
                         </Space>
                     </Form.Item>
                 </Form>

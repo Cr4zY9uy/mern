@@ -1,17 +1,27 @@
 import "./../style/header.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "antd";
 import {
     MenuFoldOutlined,
     MenuUnfoldOutlined,
 } from '@ant-design/icons'
-function Header() {
-
+import { connect } from "react-redux";
+import USER_ACTION from "../../../redux/user/user_action";
+import { useNavigate } from "react-router";
+function Header(props) {
     const [collapsed, setCollapsed] = useState(false);
+    const user = props.state.currentUser.name;
+    const navigate = useNavigate();
     const toggleCollapsed = () => {
-        setCollapsed(!collapsed);
+        const newCollapsed = !collapsed;
+        setCollapsed(newCollapsed);
+        props.onToggleCollapsed(newCollapsed);
     };
 
+    const LogOut = () => {
+        props.logOut();
+        navigate('/');
+    }
     return (
         <div className="header">
             <div className="d-flex justify-content-between align-items-center" style={{ height: "10vh" }}>
@@ -24,10 +34,30 @@ function Header() {
                 </Button>
                 <div className="d-flex align-items-center icon_wrap ">
                     <div className="home"><i className="bi bi-house-door-fill"></i></div>
-                    <div className="wrap_admin d-flex justity-content-center align-items-center"><img src="./images/icon/admin.png" alt="logo" /></div>
+                    <div className="wrap_admin  d-flex justity-content-center align-items-center"><img src="/images/icon/admin.png" alt="logo" />
+                        <div className="sub_menu">
+                            <div>{user}</div>
+                            <div onClick={LogOut} style={{ borderTop: "0.01rem solid rgb(27, 149, 255)" }}>
+                                Logout
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     );
 }
-export default Header;
+
+const mapStateToProps = (state, ownProps) => {
+    return {
+        state: state.user_reducer
+    }
+}
+const mapDispatchToProps = (dispatch) => {
+    return {
+        logOut: () => {
+            dispatch({ type: USER_ACTION.LOGOUT })
+        }
+    }
+}
+export default connect(mapStateToProps, mapDispatchToProps)(Header);

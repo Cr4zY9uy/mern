@@ -39,7 +39,7 @@
     padding-top: 0px;
 }
 
-.wrap_input>div button {
+.wrap_input>form div button {
     text-align: center;
     margin-top: 20px;
     width: 15vw;

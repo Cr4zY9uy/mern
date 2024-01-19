@@ -1,20 +1,112 @@
-import "./../style/addCategory.css";
+import "./../style/editCategory.css";
 import {
     FormOutlined,
     UploadOutlined
 } from "@ant-design/icons";
+import { fill } from '@cloudinary/url-gen/actions/resize';
 import Card from "antd/es/card/Card";
+import { AdvancedImage } from '@cloudinary/react';
 import {
     Form,
     Input,
-    Select,
     Upload,
     Button,
     Space
 } from 'antd';
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router";
+import { Store } from "react-notifications-component";
+import { detail_category, edit_category } from "../../../services/category_service";
+import { Cloudinary } from "@cloudinary/url-gen";
 function EditCategory() {
-    const { Option } = Select;
+    const navigate = useNavigate();
+    const [form] = Form.useForm();
+    const [data, setData] = useState({});
+    const [image, setImage] = useState("");
+    const [category, setCategory] = useState({});
+    const { id } = useParams();
+    const handleInput = (e) => {
+        setData({ ...data, [e.target.name]: e.target.value });
+    }
+    const category_detail = async () => {
+        try {
+            const rs = await detail_category(id);
+            setCategory(rs.data.category);
+            if (rs.status !== 200) {
+                console.log(rs.statusText)
+            }
+        } catch (err) {
+            if (err.response) {
+                console.log(err.response.status);
+            }
+        }
+
+    }
+    useEffect(() => {
+        category_detail();
+    }, [])
+    useEffect(() => {
+        if (category) {
+            form.setFieldValue("name", category.name)
+            form.setFieldValue("description", category.description)
+        }
+    }, [category])
+
+    const cld = new Cloudinary({
+        cloud: {
+            cloudName: 'dv7ni8uod'
+        }
+    });
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const res = await edit_category(id, { ...data, image });
+            if (res.status === 200) {
+                Store.addNotification({
+                    title: "Sucess!!",
+                    message: "You edit a category successfully!",
+                    type: "success",
+                    insert: "top",
+                    container: "top-center",
+                    animationIn: ["animate__animated", "animate__fadeIn"],
+                    animationOut: ["animate__animated", "animate__fadeOut"],
+                    dismiss: {
+                        duration: 2000,
+                        onScreen: true
+                    }
+                });
+                navigate("/category")
+            }
+            else {
+                Store.addNotification({
+                    title: "Failure!!",
+                    message: "You edit a category unsuccessfully!",
+                    type: "danger",
+                    insert: "top",
+                    container: "top-center",
+                    animationIn: ["animate__animated", "animate__fadeIn"],
+                    animationOut: ["animate__animated", "animate__fadeOut"],
+                    dismiss: {
+                        duration: 2000,
+                        onScreen: true
+                    }
+                });
+            }
+        } catch (error) {
+            if (error.response) {
+                console.log(error.response.status);
+            }
+        }
+    };
+
+    const handleImage = (file) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            setImage(e.target.result);
+        };
+        reader.readAsDataURL(file);
+        return false;
+    };
     const formItemLayout = {
         labelCol: {
             xs: { span: 30 },
@@ -34,25 +126,32 @@ function EditCategory() {
     };
     return (
         <div className="edit_category_panel container">
-            <h2 className='caption'><FormOutlined />Add new category</h2>
+            <h2 className='caption'><FormOutlined />Edit category</h2>
             <Card
-                title="Create a new category"
+                title="Edit a  category"
                 bordered={false}
             >
-                <Form {...formItemLayout} style={{ maxWidth: 600 }}>
+                <Form {...formItemLayout} style={{ maxWidth: 600 }} onSubmitCapture={handleSubmit}
+                    form={form}
+                >
                     <Form.Item
                         label="Name"
                         hasFeedback
                         validateStatus=""
                         help="Maximum 200 characters"
+                        name="name"
                     >
-                        <Input />
+                        <Input onChange={handleInput} defaultValue='{category.name}' name="name" />
                     </Form.Item>
-
                     <Form.Item label="Description"
                         validateStatus=""
-                        hasFeedback help="Maximum 300 characters">
-                        <Input.TextArea allowClear />
+                        hasFeedback help="Maximum 300 characters"
+                        name="description"
+                    >
+                        <Input.TextArea allowClear onChange={handleInput} name="description" defaultValue={category.description} />
+                    </Form.Item>
+                    <Form.Item label="Initial image" className="imageInitial">
+                        <AdvancedImage cldImg={cld.image(category.image).resize(fill().width(100).height(100))} />
                     </Form.Item>
                     <Form.Item
                         hasFeedback
@@ -62,7 +161,8 @@ function EditCategory() {
                         getValueFromEvent={normFile}
                         extra="Choose an image"
                     >
-                        <Upload name="logo" action="/upload.do" listType="picture" className="d-flex align-items-center">
+                        <Upload name="image" listType="picture" className="d-flex align-items-center" beforeUpload={file => handleImage(file)}
+                        >
                             <Button icon={<UploadOutlined />}>Click to upload</Button>
                         </Upload>
                     </Form.Item>
@@ -76,7 +176,7 @@ function EditCategory() {
                             <Button type="primary" htmlType="submit">
                                 Submit
                             </Button>
-                            <Button htmlType="reset">reset</Button>
+                            <Button htmlType="reset">Reset</Button>
                         </Space>
                     </Form.Item>
                 </Form>

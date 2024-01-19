@@ -14,7 +14,7 @@ function Header() {
             <div className="headers container">
                 <div className="header-logo d-flex align-items-center">
                     <Link to={"/"} className="icon">
-                        <img src="./data/logo/scart-mid.png" alt="logo" width={120} height={60} />
+                        <img src="/data/logo/scart-mid.png" alt="logo" width={120} height={60} />
                     </Link>
                 </div>
                 <div className="header-link">

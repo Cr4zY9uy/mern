@@ -5,7 +5,8 @@ const randToken = require("rand-token");
 const dotenv = require("dotenv");
 const cors = require("cors")
 const cookieParser = require("cookie-parser");
-const uri_db = 'mongodb+srv://heronakamura123:t0WLjSltwAP0khgB@scart.sggc0u9.mongodb.net/shop';
+// const uri_db = 'mongodb+srv://heronakamura123:t0WLjSltwAP0khgB@scart.sggc0u9.mongodb.net/shop';
+const uri_db = 'mongodb://127.0.0.1:27017/scart'
 const category_model = require("./models/category");
 const product_model = require("./models/product");
 const user_model = require("./models/user");
@@ -13,7 +14,6 @@ const order_model = require("./models/order");
 const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
 const cloudinary = require("./cloudinary");
-const { default: uploadImages } = require("./uploadImages");
 dotenv.config();
 app.listen(process.env.PORT, function () {
     console.log("Server is running");
@@ -31,32 +31,31 @@ app.use(cors());
 app.get("/", (req, res) => {
     res.send("app runnig");
 })
-app.post("/category/add", async function (req, res) {
+
+const checkAuth = async (req, res, next) => {
+    const accessToken = req.headers.x_authorization;
+    if (!accessToken) {
+        return res.status(401).json({ message: "Not allowed" });
+    }
+    const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
+
+    const verified = await jwt.verify(
+        accessToken,
+        accessTokenSecret,
+    );
+    if (!verified) {
+        return res
+            .status(401)
+            .json({ message: "Not allowed" });
+    }
+    console.log(verified)
+    const user = await user_model.findOne({ username: verified.username })
+    req.user = user;
+    return next();
+};
+app.post("/category/add", checkAuth, async function (req, res) {
     try {
         const data = req.body;
-        // const uploadedImage = await cloudinary.uploader.upload(data.image,
-        //     {
-        //         upload_preset: 'yqk67lv3',
-        //     },
-        //     function (error, result) {
-        //         if (error) {
-        //             console.log(error);
-        //         }
-        //         console.log(result);
-        //     });
-
-        // try {
-        //     res.status(200).json(uploadedImage)
-        // }
-        // catch (err) {
-        //     console.log(err);
-        // }
-        // const formalData = {
-        //     category_id: data.category_id,
-        //     name: data.name,
-        //     image: uploadedImage.public_id + '=' + process.env.CLOUDINARY_NAME,
-        //     description: data.description
-        // }
         const checkExistId = await category_model.findOne({ category_id: data.category_id });
         if (checkExistId != null) {
             return res.status(400).json({ messsage: "Category id is existed" });
@@ -65,7 +64,17 @@ app.post("/category/add", async function (req, res) {
         if (checkExistName != null) {
             return res.status(400).json({ messsage: "Category name is existed" });
         }
-        // console.log('formalData ' + formalData);
+        const uploadedImage = await cloudinary.uploader.upload(data.image,
+            {
+                upload_preset: 'yqk67lv3',
+            },
+            function (error, result) {
+                if (error) {
+                    return res.status(401).json({ error: error.message });
+                }
+            });
+
+        data.image = uploadedImage.public_id;
         const category = new category_model(data);
         await category.save();
         return res.status(201).json({ message: "Done" });
@@ -83,7 +92,8 @@ app.get("/category", async function (req, res) {
             const category_list = data.map((category) => ({
                 category_id: category.category_id,
                 name: category.name,
-                description: category.description
+                description: category.description,
+                image: category.image
             })
             );
             return res.status(200).json({ category_list });
@@ -111,8 +121,12 @@ app.get("/product/category/:name", async function (req, res) {
                 product_id: product.product_id,
                 title: product.title,
                 price: product.price,
-                price_promotion: product.price_promotion,
+                description: product.description,
+                qty: product.qty,
+                category_name: product.category_name,
                 thumbnail: product.thumbnail,
+                images: [product.images],
+                price_promotion: product.price_promotion,
                 status: product.status
             })
             );
@@ -134,7 +148,8 @@ app.get("/category/:id", async function (req, res) {
             const category = {
                 category_id: data.category_id,
                 name: data.name,
-                description: data.description
+                description: data.description,
+                image: data.image
             };
             return res.status(200).json({ category });
         }
@@ -146,35 +161,67 @@ app.put("/category/edit/:id", async function (req, res) {
     try {
         const category_id = req.params.id;
         const data = req.body;
+
         const find = await category_model.findOne({ category_id: category_id });
         if (find === null) {
             return res.status(400).json({ message: "Category no exists" });
         }
         else {
-            const update_category = await category_model.findOneAndUpdate(
-                {
-                    category_id: category_id
-                },
-                {
-                    name: data.name,
-                    description: data.description
-                },
-                {
-                    new: true
-                }
-            );
-            await update_category.save();
-            return res.status(200).json({ update_category });
+            if (data.image !== "") {
+                const uploadedImage = await cloudinary.uploader.upload(data.image,
+                    {
+                        upload_preset: 'yqk67lv3',
+                    },
+                    function (error, result) {
+                        if (error) {
+                            console.log(error.message)
+                        }
+                    });
+
+                const update_category = await category_model.findOneAndUpdate(
+                    {
+                        category_id: category_id
+                    },
+                    {
+                        name: data.name,
+                        description: data.description,
+                        image: uploadedImage.public_id
+                    },
+                    {
+                        new: true
+                    }
+                );
+                await update_category.save();
+                return res.status(200).json({ update_category });
+            }
+            else {
+                const update_category = await category_model.findOneAndUpdate(
+                    {
+                        category_id: category_id
+                    },
+                    {
+                        name: data.name,
+                        description: data.description,
+                        image: find.image
+                    },
+                    {
+                        new: true
+                    }
+                );
+                await update_category.save();
+                return res.status(200).json({ update_category });
+            }
+
         }
     } catch (error) {
         return res.status(400).json({ message: error.message });
     }
 })
-app.delete("/category/delete/:id", async function (req, res) {
+app.delete("/category/delete/:id", checkAuth, async function (req, res) {
     try {
         const id = req.params.id;
         const data = await category_model.findOneAndDelete({ category_id: id });
-        if (data) {
+        if (data !== null) {
             return res.status(200).json({ message: "Category deleted successfully" });
         } else {
             return res.status(404).json({ message: "Category not found" });
@@ -203,11 +250,11 @@ app.post("/login", async function (req, res) {
         const data = req.body;
         const user = await user_model.findOne({ username: data.username });
         if (!user) {
-            return res.status(401).json({ message: "Username not existed" });
+            return res.status(400).json({ message: "Username not existed" });
         }
         const verify = await bcrypt.compare(data.password, user.password);
         if (!verify) {
-            return res.status(401).json({ message: "Password not true" });
+            return res.status(400).json({ message: "Password not true" });
         }
         const accessTokenLife = process.env.ACCESS_TOKEN_LIFE;
         const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
@@ -218,7 +265,7 @@ app.post("/login", async function (req, res) {
         const accessToken = jwt.sign(dataForAccessToken, accessTokenSecret, { expiresIn: accessTokenLife });
         if (!accessToken) {
             return res
-                .status(401)
+                .status(400)
                 .json({ message: 'Login fail, retry' });
         }
         let refreshToken = randToken.generate(12);
@@ -228,15 +275,15 @@ app.post("/login", async function (req, res) {
         else {
             refreshToken = user.refreshToken;
         }
+
         return res.status(200).json({
             user: {
                 username: user.username,
-                password: user.password,
-                name: user.name
+                name: user.name,
             },
-            token: {
-                accessToken,
-                refreshToken
+            jwt: {
+                access_token: accessToken,
+                refresh_token: refreshToken
             }
         })
     } catch (error) {
@@ -244,7 +291,7 @@ app.post("/login", async function (req, res) {
     }
 })
 app.post('/refresh_token', async (req, res) => {
-    const accessToken = req.headers.x_authorization;
+    const accessToken = req.headers.X_authorization;
     if (!accessToken) {
         return res.status(400).json({ message: "Not allowed" });
     }
@@ -282,37 +329,15 @@ app.post('/refresh_token', async (req, res) => {
     });
 })
 app.get('/set_cookie', async (req, res) => {
-    res.cookie('user', true, { maxAge: 1000 * 60 * 60 * 24 * 3, httpOnly: true });
-    res.send("cookiee")
+    res.status(403).send("Forbidden");
 })
-app.get('/read_cookie', async (req, res) => {
-    const data = req.cookies.user;
-    res.json(data);
-    console.log(data);
-})
+// app.get('/read_cookie', async (req, res) => {
+//     const data = req.cookies.user;
+//     res.json(data);
+//     console.log(data);
+// })
 
-const checkAuth = async (req, res, next) => {
-    const accessToken = req.headers.x_authorization;
-    if (!accessToken) {
-        return res.status(401).json({ message: "Not allowed" });
-    }
-    const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
-
-    const verified = await jwt.verify(
-        accessToken,
-        accessTokenSecret,
-    );
-    if (!verified) {
-        return res
-            .status(401)
-            .json({ message: "Not allowed" });
-    }
-
-    const user = await user_model.findOne({ username: verified.payload.username })
-    req.user = user;
-    return next();
-};
-app.get("/product", async (req, res) => {
+app.get("/product_paginate", async (req, res) => {
 
     const limit = 9;
     const page = parseInt(req.query.page) ? parseInt(req.query.page) : 0;
@@ -339,7 +364,7 @@ app.get("/product", async (req, res) => {
         return res.status(400).json({ message: error.message });
     }
 })
-app.post("/product/add", async (req, res) => {
+app.post("/product/add", checkAuth, async (req, res) => {
     const data = req.body;
     try {
         const checkExistId = await product_model.findOne({ product_id: data.product_id });
@@ -350,6 +375,16 @@ app.post("/product/add", async (req, res) => {
         if (checkExistName != null) {
             return res.status(400).json({ messsage: "Product title is existed" });
         }
+        const uploadedImage = await cloudinary.uploader.upload(data.image,
+            {
+                upload_preset: 'yqk67lv3',
+            },
+            function (error, result) {
+                if (error) {
+                    return res.status(401).json({ error: error.message });
+                }
+            });
+        data.thumbnail = uploadedImage.public_id;
         const product = new product_model(data);
         await product.save();
         return res.status(201).json({ message: "Done" });
@@ -367,6 +402,15 @@ app.put("/product/edit/:id", async function (req, res) {
             return res.status(400).json({ message: "Product no exists" });
         }
         else {
+            const uploadedImage = await cloudinary.uploader.upload(data.image,
+                {
+                    upload_preset: 'yqk67lv3',
+                },
+                function (error, result) {
+                    if (error) {
+                        return res.status(401).json({ error: error.message });
+                    }
+                });
             const update_product = await product_model.findOneAndUpdate(
                 {
                     product_id: product_id
@@ -377,7 +421,7 @@ app.put("/product/edit/:id", async function (req, res) {
                     description: data.description,
                     qty: data.qty,
                     category_name: data.category_name,
-                    thumbnail: data.thumbnail,
+                    thumbnail: uploadedImage.public_id,
                     images: [data.images],
                     price_promotion: data.price_promotion,
                     status: data.status
@@ -474,7 +518,7 @@ app.get("/product/hot", async function (req, res) {
         return res.status(400).json({ message: error.message });
     }
 })
-app.delete("/product/delete/:id", async function (req, res) {
+app.delete("/product/delete/:id", checkAuth, async function (req, res) {
     try {
         const id = req.params.id;
         const data = await product_model.findOneAndDelete({ product_id: id });
@@ -532,7 +576,7 @@ app.get("/order", async (req, res) => {
         return res.status(400).json({ message: error.message });
     }
 })
-app.post("/order/add", async (req, res) => {
+app.post("/order/add", checkAuth, async (req, res) => {
     const data = req.body;
     try {
         const checkExistId = await order_model.findOne({ order_id: data.order_id });
@@ -645,10 +689,46 @@ app.get("/order/:id", async function (req, res) {
     }
 })
 
-app.delete("/product/delete/:id", async function (req, res) {
+app.delete("/order/delete/:id", checkAuth, async function (req, res) {
     try {
         const id = req.params.id;
         const data = await order_model.findOneAndDelete({ order_id: id });
+        if (data) {
+            return res.status(200).json({ message: "Order deleted successfully" });
+        } else {
+            return res.status(404).json({ message: "Order not found" });
+        }
+    } catch (error) {
+        return res.status(400).json({ message: error.message });
+    }
+})
+app.delete("/product/delete_all", checkAuth, async function (req, res) {
+    try {
+        const data = await product_model.deleteMany({ _id: { $ne: null } });
+        if (data) {
+            return res.status(200).json({ message: "Product deleted successfully" });
+        } else {
+            return res.status(404).json({ message: "Product not found" });
+        }
+    } catch (error) {
+        return res.status(400).json({ message: error.message });
+    }
+})
+app.delete("/category/delete_all", checkAuth, async function (req, res) {
+    try {
+        const data = await category_model.deleteMany({ "category_id": { $exists: true } });
+        if (data) {
+            return res.status(200).json({ message: "Category deleted successfully" });
+        } else {
+            return res.status(404).json({ message: "Category not found" });
+        }
+    } catch (error) {
+        return res.status(400).json({ message: error.message });
+    }
+})
+app.delete("/order/delete_all", checkAuth, async function (req, res) {
+    try {
+        const data = await order_model.deleteMany({ _id: { $ne: null } });
         if (data) {
             return res.status(200).json({ message: "Order deleted successfully" });
         } else {

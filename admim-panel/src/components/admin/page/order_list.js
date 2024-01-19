@@ -20,7 +20,7 @@ function Order_List() {
                         <th colSpan={2} className='wrap_delete'>
                             <div className='d-flex'>
                                 <div className='wrap' onClick={checkParent}>
-                                    <div className='wrap_parent d-flex align-items-center'><input type='checkbox' className='parent' /></div>
+                                    <div className='wrap_parent d-flex align-items-center'><input type='checkbox' className='parent'  onClick={checkParent}/></div>
                                 </div>
                                 <div className="del">
                                     <Button variant='danger'><i class="bi bi-trash-fill"></i></Button>

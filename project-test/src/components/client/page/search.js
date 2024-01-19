@@ -1,10 +1,13 @@
 import { Pagination } from "antd";
 import { Breadcrumb } from "react-bootstrap";
-import { NavLink } from "react-router-dom";
+import { NavLink, useParams } from "react-router-dom";
 import Product_Grid from "../layout/product_grid";
 import "./../style/search.css";
 import Banner_Big from "../layout/banner_big";
+import { useEffect } from "react";
 function Search() {
+    const { input } = useParams();
+
     return (
         <div className="search">
             <Banner_Big />
