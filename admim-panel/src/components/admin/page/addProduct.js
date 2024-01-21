@@ -45,6 +45,9 @@ function AddProduct() {
             }
         }
     }
+    const onFinishFailed = (errorInfo) => {
+        return errorInfo;
+    };
     useEffect(() => {
         cate_list();
     }, [])
@@ -57,43 +60,60 @@ function AddProduct() {
     }
     const handleSubmit = async (e) => {
         e.preventDefault();
-        try {
-            const res = await add_product({ ...data, image, category_name });
-            if (res.status === 201) {
-                Store.addNotification({
-                    title: "Sucess!!",
-                    message: "You add a product successfully!",
-                    type: "success",
-                    insert: "top",
-                    container: "top-center",
-                    animationIn: ["animate__animated", "animate__fadeIn"],
-                    animationOut: ["animate__animated", "animate__fadeOut"],
-                    dismiss: {
-                        duration: 2000,
-                        onScreen: true
-                    }
-                });
-                navigate("/product")
+        if (!onFinishFailed) {
+            try {
+                const res = await add_product({ ...data, image, category_name });
+                if (res.status === 201) {
+                    Store.addNotification({
+                        title: "Sucess!!",
+                        message: "You add a product successfully!",
+                        type: "success",
+                        insert: "top",
+                        container: "top-center",
+                        animationIn: ["animate__animated", "animate__fadeIn"],
+                        animationOut: ["animate__animated", "animate__fadeOut"],
+                        dismiss: {
+                            duration: 2000,
+                            onScreen: true
+                        }
+                    });
+                    navigate("/product")
+                }
+                else {
+                    Store.addNotification({
+                        title: "Failure!!",
+                        message: "You add a product unsuccessfully!",
+                        type: "danger",
+                        insert: "top",
+                        container: "top-center",
+                        animationIn: ["animate__animated", "animate__fadeIn"],
+                        animationOut: ["animate__animated", "animate__fadeOut"],
+                        dismiss: {
+                            duration: 2000,
+                            onScreen: true
+                        }
+                    });
+                }
+            } catch (error) {
+                if (error.response) {
+                    console.log(error.response.status);
+                }
             }
-            else {
-                Store.addNotification({
-                    title: "Failure!!",
-                    message: "You add a product unsuccessfully!",
-                    type: "danger",
-                    insert: "top",
-                    container: "top-center",
-                    animationIn: ["animate__animated", "animate__fadeIn"],
-                    animationOut: ["animate__animated", "animate__fadeOut"],
-                    dismiss: {
-                        duration: 2000,
-                        onScreen: true
-                    }
-                });
-            }
-        } catch (error) {
-            if (error.response) {
-                console.log(error.response.status);
-            }
+        }
+        else {
+            Store.addNotification({
+                title: "Failure!!",
+                message: "You add a product unsuccessfully!",
+                type: "danger",
+                insert: "top",
+                container: "top-center",
+                animationIn: ["animate__animated", "animate__fadeIn"],
+                animationOut: ["animate__animated", "animate__fadeOut"],
+                dismiss: {
+                    duration: 2000,
+                    onScreen: true
+                }
+            });
         }
     };
     useEffect(() => {
@@ -122,7 +142,7 @@ function AddProduct() {
                 title="Create a new product"
                 bordered={false}
             >
-                <Form {...formItemLayout} style={{ maxWidth: 600 }} onSubmitCapture={handleSubmit}>
+                <Form {...formItemLayout} style={{ maxWidth: 600 }} onSubmitCapture={handleSubmit} onFinishFailed={onFinishFailed}>
                     <Form.Item
                         label="Product ID"
                         hasFeedback

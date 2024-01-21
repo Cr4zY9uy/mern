@@ -4,20 +4,20 @@ export const list_category = async () => {
     const url = URL.CATEGORY.ALL;
     try {
         const rs = await api.get(url);
-        return rs.data;
+        return rs;
     }
     catch (error) {
-        return error.message;
+        return {};
     }
 }
 export const detail_category = async (id) => {
     const url = URL.CATEGORY.DETAIL + id;
     try {
         const rs = await api.get(url);
-        return rs.data.products;
+        return rs;
     }
     catch (error) {
-        return error.message;
+        return {};
     }
 }
 

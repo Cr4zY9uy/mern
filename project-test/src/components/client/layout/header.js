@@ -1,14 +1,32 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import "./../style/header.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Modal_Search from "./modal_search";
+import { list_category } from "../../../services/category_service";
 function Header() {
     const navigate = useNavigate();
     const [searchView, setSearchView] = useState(false);
+    const [category, setCategory] = useState([]);
     const toggleSearchView = () => {
         setSearchView(!searchView);
     };
     window.scrollTo(0, 0);
+    const cate_list = async () => {
+        try {
+            const rs = await list_category();
+            setCategory(rs.data.category_list);
+            if (rs.status !== 200) {
+                console.log(rs.statusText)
+            }
+        } catch (err) {
+            if (err.response) {
+                console.log(err.response.status);
+            }
+        }
+    }
+    useEffect(() => {
+        cate_list();
+    }, [])
     return (
         <header>
             <div className="headers container">
@@ -19,7 +37,15 @@ function Header() {
                 </div>
                 <div className="header-link">
                     <Link to={"/"}>home</Link>
-                    <Link to={"/category"}>categories</Link>
+                    <Link className="main_menu">
+                        <div>categories</div>
+                        <div className="sub_menu">
+                            {category.map((item) => (
+                                <Link key={item.category_id} to={`/category/${item.name}`}>{item.name}</Link>
+                            ))}
+                        </div>
+                    </Link>
+
                     <Link to={"/shop"}>shop</Link>
                     <Link to={"/blog"}>blogs</Link>
                 </div>

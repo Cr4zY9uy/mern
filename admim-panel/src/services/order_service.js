@@ -2,7 +2,7 @@ import URL from "./url"
 import api from "./api";
 
 export const list_order = async (page) => {
-    const url = URL.ORDER.PAGINATE + "?_page=" + page;
+    const url = URL.ORDER.PAGINATE + "?page=" + page;
     try {
         const rs = await api.get(url)
         return rs;
@@ -45,3 +45,15 @@ export const delete_order = async (id) => {
     }
 
 }
+export const delete_order_all = async () => {
+    const url = URL.ORDER.DELETE_ALL;
+    try {
+        const rs = await api.delete(url)
+        return rs;
+    }
+    catch (error) {
+        return {};
+    }
+
+}
+

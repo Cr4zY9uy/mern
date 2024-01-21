@@ -48,7 +48,6 @@ const checkAuth = async (req, res, next) => {
             .status(401)
             .json({ message: "Not allowed" });
     }
-    console.log(verified)
     const user = await user_model.findOne({ username: verified.username })
     req.user = user;
     return next();
@@ -105,13 +104,12 @@ app.get("/category", async function (req, res) {
 app.get("/product/category/:name", async function (req, res) {
 
     const cateName = req.params.name;
-    const encodeCateName = decodeURIComponent(cateName);
     const limit = 9;
     const page = parseInt(req.query.page) ? parseInt(req.query.page) : 1;
     const skip = (page - 1) * limit;
     try {
-        const dataAll = await product_model.find({ category_name: encodeCateName }).sort({ createdAt: -1 });
-        const data = await dataAll.limit(limit).skip(skip);
+        const dataAll = await product_model.find({ category_name: cateName }).sort({ createdAt: -1 });
+        const data = dataAll.slice(skip, skip + limit);
         if (dataAll.length === 0) {
             return res.status(400).json({ message: "No product" });
         }
@@ -291,23 +289,23 @@ app.post("/login", async function (req, res) {
     }
 })
 app.post('/refresh_token', async (req, res) => {
-    const accessToken = req.headers.X_authorization;
+    console.log(req.headers.x_authorization, req.body);
+    const accessToken = req.headers.x_authorization;
     if (!accessToken) {
-        return res.status(400).json({ message: "Not allowed" });
+        return res.status(400).json({ message: "Not allowed2" });
     }
     const refreshToken = req.body.refreshToken;
     if (!refreshToken) {
-        return res.status(400).json({ message: "Not allowed" });
+        return res.status(400).json({ message: "Not allowed3" });
     }
     const accessTokenLife = process.env.ACCESS_TOKEN_LIFE;
     const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
     const decoded = await jwt.verify(accessToken, accessTokenSecret, { ignoreExpiration: true });
     if (!decoded) {
-        return res.status(400).json({ message: "Not allowed" });
+        return res.status(400).json({ message: "Not allowed 1" });
     }
-    const username = decoded.payload.username;
-    const role = decoded.payload.role;
-    role
+    const username = decoded.username;
+    const role = decoded.role;
     const user = await user_model.findOne({ username: username });
     if (!user) {
         return res.status(400).json({ message: "User not exist" });
@@ -340,13 +338,15 @@ app.get('/set_cookie', async (req, res) => {
 app.get("/product_paginate", async (req, res) => {
 
     const limit = 9;
-    const page = parseInt(req.query.page) ? parseInt(req.query.page) : 0;
+    const page = parseInt(req.query.page) ? parseInt(req.query.page) : 1;
     const skip = (page - 1) * limit;
     try {
-        const data = await product_model.find().limit(limit).skip(skip).sort({ createdAt: -1 });
+        const dataAll = await product_model.find().sort({ createdAt: -1 });
+        const data = dataAll.slice(skip, skip + limit);
         if (data.length === 0) {
             return res.status(400).json({ message: "No product" });
         }
+        const total_page = Math.ceil(dataAll.length / limit);
         const product_list = data.map((product) => ({
             product_id: product.product_id,
             title: product.title,
@@ -359,7 +359,7 @@ app.get("/product_paginate", async (req, res) => {
             price_promotion: product.price_promotion,
             status: product.status
         }));
-        return res.status(200).json({ product_list });
+        return res.status(200).json({ product_list, total_page: total_page, total_product: dataAll.length, page: page });
     } catch (error) {
         return res.status(400).json({ message: error.message });
     }
@@ -532,15 +532,17 @@ app.delete("/product/delete/:id", checkAuth, async function (req, res) {
     }
 })
 
-app.get("/order", async (req, res) => {
+app.get("/order_paginate", async (req, res) => {
     const limit = 9;
-    const page = parseInt(req.query.page) ? parseInt(req.query.page) : 0;
+    const page = parseInt(req.query.page) ? parseInt(req.query.page) : 1;
     const skip = (page - 1) * limit;
     try {
-        const data = await order_model.find().limit(limit).skip(skip).sort({ createdAt: -1 });
+        const dataAll = await order_model.find().sort({ createdAt: -1 });
+        const data = dataAll.slice(skip, skip + limit);
         if (data.length === 0) {
             return res.status(400).json({ message: "No order" });
         }
+        const total_page = Math.ceil(dataAll.length / limit);
         const order_list = data.map((order) => ({
             order_id: order_id,
             first_name: order.first_name,
@@ -571,12 +573,12 @@ app.get("/order", async (req, res) => {
             received: order.received,
             note: order.note
         }));
-        return res.status(200).json({ order_list });
+        return res.status(200).json({ order_list, total_page: total_page, total_product: dataAll.length, page: page });
     } catch (error) {
         return res.status(400).json({ message: error.message });
     }
 })
-app.post("/order/add", checkAuth, async (req, res) => {
+app.post("/order/add", async (req, res) => {
     const data = req.body;
     try {
         const checkExistId = await order_model.findOne({ order_id: data.order_id });

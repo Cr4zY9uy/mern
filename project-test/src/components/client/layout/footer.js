@@ -6,7 +6,7 @@ function Footer() {
         <div className="wrap-footer">
             <footer className="footer container">
                 <div>
-                    <img src="./data/logo/scart-mid.png" alt="logo" width={240} height={120} />
+                    <img src="/data/logo/scart-mid.png" alt="logo" width={240} height={120} />
                     <p>S-Cart: An organic fruits store</p>
                     <hr></hr>
                 </div>
@@ -23,10 +23,10 @@ function Footer() {
                     <p>Payments</p>
                 </div>
                 <div>
-                    <h3>Service</h3>
+                    <h3>QnA</h3>
                     <p>How to purchase</p>
                     <p>FAQ</p>
-                    <p>What is Notos?</p>
+                    <p>What is S-cart?</p>
                 </div>
             </footer>
         </div>

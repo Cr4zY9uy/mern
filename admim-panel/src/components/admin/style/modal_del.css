@@ -1,6 +1,6 @@
 .deleteModal {
     background-repeat: no-repeat;
-    background-color: rgba(254, 254, 254, 0.444);
+    background-color: rgb(13, 13, 13);
     background-position: center;
     background-size: 100px 100px;
     top: 0;
@@ -25,6 +25,6 @@
 }
 
 .ant-modal-mask {
-    background-color:unset!important;
+    background-color: unset !important;
 
 }

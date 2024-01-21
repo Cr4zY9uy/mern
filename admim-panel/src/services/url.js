@@ -10,6 +10,7 @@ const URL = {
     },
     CATEGORY: {
         ALL: 'category',
+        PAGINATE: 'category_paginate',
         DETAIL: 'category/',
         ADD: 'category/add',
         DELETE: 'category/delete/',
@@ -19,9 +20,10 @@ const URL = {
     USER: {
         LOGIN: 'login',
         REGISTER: 'register',
+        REFRESH_TOKEN: 'refresh_token'
     },
     ORDER: {
-        PAGINATE: 'order',
+        PAGINATE: 'order_paginate',
         DETAIL: 'order/',
         EDIT: 'order/edit/',
         DELETE: 'order/delete/',

@@ -10,6 +10,16 @@ export const list_category = async () => {
         return {};
     }
 }
+export const list_category_paginate = async (page) => {
+    const url = URL.CATEGORY.PAGINATE + '?page=' + page;
+    try {
+        const rs = await api.get(url);
+        return rs;
+    }
+    catch (error) {
+        return {};
+    }
+}
 export const detail_category = async (id) => {
     const url = URL.CATEGORY.DETAIL + id;
     try {

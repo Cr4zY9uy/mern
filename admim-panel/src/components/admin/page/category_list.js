@@ -11,11 +11,14 @@ import { AdvancedImage } from '@cloudinary/react';
 import { delete_category_all, list_category } from '../../../services/category_service';
 import { useEffect, useState } from 'react';
 import { Store } from 'react-notifications-component';
-import Delete_Modal from '../layout/modal';
+import Delete_Modal from '../layout/modal_del';
+import { Modal } from 'antd';
 function Category_List() {
     const [type, setType] = useState("");
+    const [delID, setDelID] = useState("");
     const [category, setCategory] = useState([]);
     const navigate = useNavigate();
+    const [delStatus, setDelStatus] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const cate_list = async () => {
         try {
@@ -65,10 +68,10 @@ function Category_List() {
     }
     useEffect(() => {
         cate_list();
-        setType("category")
-    }, [])
+        setType("category");
+    }, [delStatus])
     const showModal = () => {
-        setIsModalOpen(!isModalOpen);
+        setIsModalOpen(true);
     };
     const handleModalOk = () => {
         setIsModalOpen(false);
@@ -77,6 +80,9 @@ function Category_List() {
     const handleModalCancel = () => {
         setIsModalOpen(false);
     };
+    const onDelete = () => {
+        setDelStatus(true);
+    }
     const handleCheckboxChange = () => {
         const checkboxes = document.querySelectorAll('input[type="checkbox"]');
         let count = 0;
@@ -93,40 +99,41 @@ function Category_List() {
         }
     });
     return (
-        <div className="container category_list">
-            <h2 className='caption'><MenuUnfoldOutlined style={{ paddingRight: "6px" }} />Category list</h2>
-            <Table bordered hover responsive="lg">
-                <thead>
-                    <tr>
-                        <th colSpan={2} className='wrap_delete'>
-                            <div className='d-flex'>
-                                <div className='wrap' onClick={checkParent}>
-                                    <div className='wrap_parent d-flex align-items-center'><input type='checkbox' className='parent' onClick={checkParent} /></div>
-                                </div>
-                                <div className="del">
-                                    <Button variant='danger'
+        <>
+            <div className="container category_list">
+                <h2 className='caption'><MenuUnfoldOutlined style={{ paddingRight: "6px" }} />Category list</h2>
+                <Table bordered hover responsive="lg">
+                    <thead>
+                        <tr>
+                            <th colSpan={2} className='wrap_delete'>
+                                <div className='d-flex'>
+                                    <div className='wrap' onClick={checkParent}>
+                                        <div className='wrap_parent d-flex align-items-center'><input type='checkbox' className='parent' onClick={checkParent} /></div>
+                                    </div>
+                                    <div className="del">
+                                        <Button variant='danger'
 
-                                        onClick={delete_all}
-                                    ><i class="bi bi-trash-fill"></i></Button>
+                                            onClick={delete_all}
+                                        ><i class="bi bi-trash-fill"></i></Button>
+                                    </div>
                                 </div>
-                            </div>
-                        </th>
-                        <th colSpan={8} className='wrap_insert'>
-                            <Button variant='success' onClick={() => { navigate('/category/add') }}><i class="bi bi-plus-lg"></i></Button>
-                        </th>
-                    </tr>
-                    <tr>
-                        <th></th>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Image</th>
-                        <th>Description</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {category?.map((item) => {
-                        return (
+                            </th>
+                            <th colSpan={8} className='wrap_insert'>
+                                <Button variant='success' onClick={() => { navigate('/category/add') }}><i class="bi bi-plus-lg"></i></Button>
+                            </th>
+                        </tr>
+                        <tr>
+                            <th></th>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Image</th>
+                            <th>Description</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {category?.map((item) =>
+                        (
 
                             <tr key={item.category_id}>
                                 <td><input type='checkbox' className='child' /></td>
@@ -137,17 +144,20 @@ function Category_List() {
                                 </td>
                                 <td>{item.description}</td>
                                 <td>
-                                    <Button variant='danger' style={{ marginRight: "10px" }} onClick={showModal}><i class="bi bi-trash-fill"></i></Button>
+                                    <Button variant='danger' style={{ marginRight: "10px" }} onClick={() => {
+                                        showModal();
+                                        setDelID(item.category_id)
+                                    }}><i class="bi bi-trash-fill"></i></Button>
                                     <Button variant='warning' onClick={() => { navigate(`/category/edit/${item.category_id}`) }}><FormOutlined /></Button>
                                 </td>
-                                <Delete_Modal status={isModalOpen} onOk={handleModalOk} onCancel={handleModalCancel} type_del={type} id_del={item.category_id} />
                             </tr>
                         )
-                    })}
-
-                </tbody>
-            </Table>
-        </div >
+                        )}
+                    </tbody>
+                </Table>
+            </div >
+            <Delete_Modal status={isModalOpen} onOk={handleModalOk} onCancel={handleModalCancel} type_del={type} id_del={delID} onDel={onDelete} />
+        </>
     );
 }
 export default Category_List;

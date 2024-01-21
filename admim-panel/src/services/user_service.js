@@ -11,3 +11,23 @@ export const login = async (user) => {
         return {};
     }
 }
+export const refreshToken = async () => {
+    const url = URL.USER.REFRESH_TOKEN;
+    try {
+        const rs = await api.post(url, {
+            refreshToken: JSON.parse(localStorage.getItem("user")).jwt.refresh_token
+        });
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        currentUser.jwt.access_token = rs.data.accessToken;
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+    } catch (error) {
+        console.error('Refresh token failed:', error.message);
+    }
+}
+function scheduleTokenRefresh() {
+    const refreshInterval = 10 * 60 * 1000;
+    refreshToken();
+    setInterval(refreshToken, refreshInterval);
+}
+
+scheduleTokenRefresh();

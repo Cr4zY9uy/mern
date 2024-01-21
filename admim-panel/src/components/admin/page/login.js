@@ -38,10 +38,10 @@ function Login(props) {
                             label="Username"
                             className="mb-3"
                         >
-                            <Form.Control type="text" placeholder="Username" name="username" onChange={hanldeInput} />
+                            <Form.Control type="text" placeholder="Username" name="username" onChange={hanldeInput} required />
                         </FloatingLabel>
                         <FloatingLabel controlId="floatingPassword" label="Password">
-                            <Form.Control type="password" placeholder="Password" name="password" onChange={hanldeInput} />
+                            <Form.Control type="password" placeholder="Password" name="password" onChange={hanldeInput} required />
                         </FloatingLabel>
                         <div className="d-flex justify-content-center">
                             <Button size="lg" variant="primary" type="submit">Login</Button>

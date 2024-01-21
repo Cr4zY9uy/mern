@@ -1,6 +1,8 @@
 .product_hot {
     height: 50vh;
     margin-top: 20px;
+    display: flex;
+    flex-direction: column;
 }
 
 .product_hot h1 {
@@ -9,42 +11,29 @@
     margin-bottom: 30px;
 }
 
-.product_hot .owl-carousel.owl-theme {
+.product_hot .item {
     height: 35vh !important;
 }
 
-.product_hot .owl-carousel.owl-theme img {
+.product_hot .item img {
     height: 100%;
     width: 20vw;
     margin-left: 20px;
 }
 
-.product_hot .owl-carousel.owl-theme .owl-item {
+.product_hot .item {
     height: 100%;
 }
 
-.product_hot .owl-carousel.owl-theme .owl-stage-outer {
-    height: 100%;
-}
 
-.product_hot .owl-carousel.owl-theme .owl-stage-outer .owl-stage {
-    height: 100%;
-}
-
-.product_hot .owl-carousel.owl-theme .owl-stage-outer .owl-stage .owl-item {
+.product_hot .item {
     height: 100%;
     border: 0.01rem solid rgb(146, 42, 141);
     border-radius: 15px;
+    width: 49%;
 }
 
-.product_hot .owl-carousel.owl-theme .owl-stage-outer .owl-stage .owl-item .item {
-    height: 100%;
 
-}
-
-.product_hot .owl-nav {
-    display: none;
-}
 
 .product_hot .discount {
     text-decoration: line-through;

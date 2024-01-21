@@ -11,17 +11,19 @@ import { Store } from 'react-notifications-component';
 import { delete_product_all, paginate_product } from '../../../services/product_service';
 import { AdvancedImage } from '@cloudinary/react';
 import { fill } from '@cloudinary/url-gen/actions/resize';
-import Delete_Modal from '../layout/modal';
+import Delete_Modal from '../layout/modal_del';
 function Product_List() {
     const [type, setType] = useState("");
-    const [category, setCategory] = useState([]);
+    const [product, setProduct] = useState([]);
     const navigate = useNavigate();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [page, setPage] = useState(1);
-    const cate_list = async () => {
+    const [delID, setDelID] = useState("");
+    const [delStatus, setDelStatus] = useState(false);
+    const product_list = async () => {
         try {
             const rs = await paginate_product(page);
-            setCategory(rs.data.product_list);
+            setProduct(rs.data.product_list);
             if (rs.status !== 200) {
                 console.log(rs.statusText)
             }
@@ -65,16 +67,19 @@ function Product_List() {
         }
     }
     useEffect(() => {
-        cate_list();
-        setType("category")
-    }, [])
+        product_list();
+        setType("product")
+        console.log(delStatus);
+    }, [delStatus])
     const showModal = () => {
         setIsModalOpen(!isModalOpen);
     };
     const handleModalOk = () => {
         setIsModalOpen(false);
     };
-
+    const onDelete = () => {
+        setDelStatus(prevDelStatus => !prevDelStatus);
+    }
     const handleModalCancel = () => {
         setIsModalOpen(false);
     };
@@ -131,7 +136,7 @@ function Product_List() {
                     </tr>
                 </thead>
                 <tbody>
-                    {category?.map((item) => {
+                    {product?.map((item) => {
                         return (
 
                             <tr key={item.product_id}>
@@ -148,15 +153,18 @@ function Product_List() {
                                 <td>{item.price_promotion}</td>
                                 <td>{item.status === 1 ? <div className='product_hot'>HOT</div> : ""}</td>
                                 <td>
-                                    <Button variant='danger' style={{ marginRight: "10px" }} onClick={showModal}><i class="bi bi-trash-fill"></i></Button>
+                                    <Button variant='danger' style={{ marginRight: "10px" }} onClick={() => {
+                                        showModal();
+                                        setDelID(item.product_id)
+                                    }}><i class="bi bi-trash-fill"></i></Button>
                                     <Button variant='warning' onClick={() => { navigate(`/product/edit/${item.product_id}`) }}><FormOutlined /></Button>
                                 </td>
-                                <Delete_Modal status={isModalOpen} onOk={handleModalOk} onCancel={handleModalCancel} type_del={type} id_del={item.product_id} />
                             </tr>
                         )
                     })}
                 </tbody>
             </Table>
+            <Delete_Modal status={isModalOpen} onOk={handleModalOk} onCancel={handleModalCancel} type_del={type} id_del={delID} onDel={onDelete} />
         </div>
     );
 }

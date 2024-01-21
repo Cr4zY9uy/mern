@@ -1,4 +1,5 @@
 import './App.css';
+import 'react-notifications-component/dist/theme.css'
 import { Routes, Route } from 'react-router-dom';
 import Home from './components/client/page/home';
 import Search from './components/client/page/search';
@@ -14,10 +15,12 @@ import Order_Success from './components/client/page/order_success';
 import Blog_Page from './components/client/page/blog';
 import Category from './components/client/page/category';
 import ScrollToTop from 'react-scroll-to-top';
+import { ReactNotifications } from 'react-notifications-component';
 function App() {
   return (
     <>
       <Header />
+      <ReactNotifications />
       <Routes>
         <Route path='/' element={<Home />} />
         <Route path='/search/:option/:input' element={<Search />} />
@@ -28,7 +31,7 @@ function App() {
         <Route path='/checkout_confirm' element={<Checkout_Confirm />} />
         <Route path='/order_success' element={<Order_Success />} />
         <Route path='/blog' element={<Blog_Page />} />
-        <Route path='/category' element={<Category />} />
+        <Route path='/category/:name' element={<Category />} />
       </Routes>
       <ScrollToTop smooth />
       <Footer />

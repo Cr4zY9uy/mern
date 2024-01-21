@@ -8,18 +8,29 @@ import { Breadcrumb, Button } from "react-bootstrap";
 import Product_LSView from "../layout/product_LSView";
 import { NavLink, useParams } from "react-router-dom";
 import Banner_Big from "../layout/banner_big";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import CART_ACTION from "../../../redux/cart/cart_action";
+import { product_by_cate, product_by_code } from "../../../services/product_service";
+import { Cloudinary } from '@cloudinary/url-gen';
+import { AdvancedImage } from '@cloudinary/react';
+
+import { Store } from "react-notifications-component";
 function ProductDetail(props) {
     const { id } = useParams();
     const [product, setProduct] = useState({});
+    const [productRelated, setProductRelated] = useState([]);
     const [quantity, setQuantity] = useState(1);
     const minus = () => {
         // Update the quantity state, ensuring it doesn't go below 0
         setQuantity((prevQuantity) => Math.max(prevQuantity - 1, 0));
         if (quantity === 0) setQuantity(0)
     };
+    const cld = new Cloudinary({
+        cloud: {
+            cloudName: 'dv7ni8uod'
+        }
+    });
 
     const plus = () => {
         setQuantity((prevQuantity) => prevQuantity + 1);
@@ -41,13 +52,47 @@ function ProductDetail(props) {
         } else {
             cart.push({ ...product, quantity: 1 });
         }
-
         props.addToCart(cart);
-        // setLoading(true);
-        // setTimeout(() => {
-        //     setLoading(false);
-        // }, 1500);
+        Store.addNotification({
+            title: "Sucess!!",
+            message: "You add to cart successfully!",
+            type: "success",
+            insert: "top",
+            container: "top-right",
+            animationIn: ["animate__animated", "animate__fadeIn"],
+            animationOut: ["animate__animated", "animate__fadeOut"],
+            dismiss: {
+                duration: 1500,
+                onScreen: true
+            }
+        });
     };
+    const load_product = async () => {
+        try {
+            const rs = await product_by_code(id);
+            setProduct(rs.data.product);
+        }
+        catch (error) {
+            console.log(error.message);
+        }
+    }
+    const load_product_cate = async () => {
+        try {
+            const rs = await product_by_cate(product.category_name);
+            setProductRelated(rs.data.product_list);
+        }
+        catch (error) {
+            console.log(error.message);
+        }
+    }
+    useEffect(() => {
+        load_product();
+    }, [id])
+    useEffect(() => {
+        if (product.category_name) {
+            load_product_cate();
+        }
+    }, [product.category_name])
     return (
         <div>
             <Banner_Big />
@@ -57,25 +102,28 @@ function ProductDetail(props) {
                         <NavLink to={'/'}>HOME</NavLink>
                     </Breadcrumb.Item>
                     <Breadcrumb.Item active>
-                        <NavLink to={'/productdetail'}>APPLE 1</NavLink>
+                        <NavLink to={`/product/${product.product_id}`}>{product.title}</NavLink>
                     </Breadcrumb.Item>
                 </Breadcrumb>
                 <div className="detail d-flex">
-                    <div className="img-group d-flex flex-column">
+                    <div className="img-group last_view d-flex flex-column">
                         <img src="./data/fruits/apple1.png" alt="apple1" />
                         <img src="./data/fruits/apple1.png" alt="apple1" />
                         <img src="./data/fruits/apple1.png" alt="apple1" />
                     </div>
                     <div className="img-product">
-                        <img src="https://res.cloudinary.com/dv7ni8uod/image/upload/v1705473417/shop/t4nikbkgqth8upeypapy.jpg" alt="apple1" />
+                        <AdvancedImage cldImg={cld.image(product.thumbnail)} />
                     </div>
                     <div className="info">
                         <div>
-                            <h1>Apple 1</h1>
-                            <h5>$60<span className="discount">$100</span></h5>
+                            <h1>{product.title}</h1>
+                            <h5>
+                                {product.price * (1 - parseFloat(product.price_promotion))}$
+                                {product.price_promotion === 0 ? "" : <span className="discount">{`${product.price}$`}</span>}
+                            </h5>
                             <hr />
-                            <p>Stock status: <span className="">In stock</span></p>
-                            <p>Category: <span>Apple</span></p>
+                            <p>Stock status: <span className="">{product.qty === 0 ? `Out of stock` : `In stock`}</span></p>
+                            <p>Category: <span>{product.category_name}</span></p>
                             <hr />
                         </div>
                         <div>
@@ -91,12 +139,19 @@ function ProductDetail(props) {
 
                                 </div>
                             </div>
-                            <Button variant="warning" style={{ width: "37.5%", height: "10vh", marginTop: 15 }}> Add to cart</Button>
+                            <Button variant="warning" style={{ width: "37.5%", height: "10vh", marginTop: 15 }} onClick={addToCart}> Add to cart</Button>
                         </div>
                     </div>
                 </div>
                 <Tabs defaultActiveKey="1" items={items} />
-                <Product_LSView />
+                <div className="product_relate-list ">
+                    <h2>You may like</h2>
+                    <div className="relate_list row">
+                        {productRelated.filter(item => item.product_id !== id).slice(0, 4).map((item, index) => {
+                            return <Product_LSView product={item} key={index} />
+                        })}
+                    </div>
+                </div>
             </div>
         </div>
     );

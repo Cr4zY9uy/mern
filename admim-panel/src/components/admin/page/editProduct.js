@@ -55,6 +55,9 @@ function EditProduct() {
             }
         }
     }
+    useEffect(() => {
+        console.log({ ...data, image, category_name });
+    }, [data])
     const product_detail_code = async () => {
         try {
             const rs = await detail_product_code(id);
@@ -76,8 +79,7 @@ function EditProduct() {
     });
     useEffect(() => {
         product_detail_code();
-        console.log(product)
-    }, [data])
+    }, [])
     useEffect(() => {
         cate_list();
     }, [])

@@ -28,7 +28,7 @@ header {
 
 }
 
-.headers a:first-child {
+.headers .icon {
     margin-left: 0;
 }
 
@@ -43,9 +43,12 @@ header {
 }
 
 .header-link {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
     width: 70%;
     text-align: center;
-    line-height: 16px;
+    height: 100%;
 }
 
 .header-icon {
@@ -93,4 +96,38 @@ header {
 .headers .wrap_search_modal {
     width: 1300px;
     height: 500px;
+}
+
+.headers .main_menu {
+    position: relative;
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.headers .main_menu .sub_menu a {
+    width: 150px;
+    color: rgba(0, 0, 0, .25);
+    font-weight: 300;
+    text-align: left;
+    padding: 10px 0;
+}
+
+.headers .main_menu .sub_menu a:hover {
+    color: rgba(0, 0, 0, 0.714);
+}
+
+.headers .main_menu .sub_menu {
+    display: none;
+    position: absolute;
+    z-index: 1111;
+    background-color: white;
+    top: 10vh;
+    left: -40px;
+    box-shadow: 0 14px 28px rgba(0, 0, 0, .25), 0 10px 10px rgba(0, 0, 0, .22);
+}
+
+.headers .main_menu:hover .sub_menu {
+    display: flex;
+    flex-direction: column;
 }

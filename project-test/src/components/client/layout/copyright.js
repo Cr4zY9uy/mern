@@ -8,10 +8,10 @@ function Copyright() {
                     © 2024  S-Cart : An organic fruits store.  All rights reserved
                 </div>
                 <div>
-                    Power by Anh Nguyen
+                    Powered by Anh Nguyen
                 </div>
                 <div>
-                    Link Github
+                    <a href="https://github.com/Cr4zY9uy/mern/tree/master" target="blank" >Link Github</a>
                 </div>
             </div>
         </div>

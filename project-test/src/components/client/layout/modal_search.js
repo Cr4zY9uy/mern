@@ -18,7 +18,7 @@ function Modal_Search(props) {
         navigate(`/search/${searchOption}/${searchInput}`);
     }
     const inputSearch = useDebounce(searchInput, 2000);
-    useEffect(() => {
+    useEffect(()     => {
         console.log(inputSearch);
         console.log(searchOption);
     }, [inputSearch])

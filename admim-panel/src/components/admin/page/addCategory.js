@@ -12,7 +12,7 @@ import {
     Space
 } from 'antd';
 import { Store } from 'react-notifications-component';
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { add_category } from "../../../services/category_service";
 function AddCategory() {
@@ -30,50 +30,80 @@ function AddCategory() {
             sm: { span: 14 },
         },
     };
+    const onFinishFailed = (errorInfo) => {
+        return errorInfo;
+    };
     const handleInput = (e) => {
         setData({ ...data, [e.target.name]: e.target.value });
     }
     const handleSubmit = async (e) => {
         e.preventDefault();
-        try {
-            const res = await add_category({ ...data, image });
-            if (res.status === 201) {
-                Store.addNotification({
-                    title: "Sucess!!",
-                    message: "You add a category successfully!",
-                    type: "success",
-                    insert: "top",
-                    container: "top-center",
-                    animationIn: ["animate__animated", "animate__fadeIn"],
-                    animationOut: ["animate__animated", "animate__fadeOut"],
-                    dismiss: {
-                        duration: 2000,
-                        onScreen: true
-                    }
-                });
-                navigate("/category")
+        if (!onFinishFailed) {
+            if(!image){
+                
             }
-            else {
-                Store.addNotification({
-                    title: "Failure!!",
-                    message: "You add a category unsuccessfully!",
-                    type: "danger",
-                    insert: "top",
-                    container: "top-center",
-                    animationIn: ["animate__animated", "animate__fadeIn"],
-                    animationOut: ["animate__animated", "animate__fadeOut"],
-                    dismiss: {
-                        duration: 2000,
-                        onScreen: true
-                    }
-                });
+            try {
+
+                const res = await add_category({ ...data, image });
+                if (res.status === 201) {
+                    Store.addNotification({
+                        title: "Sucess!!",
+                        message: "You add a category successfully!",
+                        type: "success",
+                        insert: "top",
+                        container: "top-center",
+                        animationIn: ["animate__animated", "animate__fadeIn"],
+                        animationOut: ["animate__animated", "animate__fadeOut"],
+                        dismiss: {
+                            duration: 2000,
+                            onScreen: true
+                        }
+                    });
+                    navigate("/category")
+                }
+                else {
+                    console.log(1113);
+                    Store.addNotification({
+                        title: "Failure!!",
+                        message: "You add a category unsuccessfully!",
+                        type: "danger",
+                        insert: "top",
+                        container: "top-center",
+                        animationIn: ["animate__animated", "animate__fadeIn"],
+                        animationOut: ["animate__animated", "animate__fadeOut"],
+                        dismiss: {
+                            duration: 2000,
+                            onScreen: true
+                        }
+                    });
+                }
+
+
+            } catch (error) {
+                if (error.response) {
+                    console.log(error.response.status);
+                }
             }
-        } catch (error) {
-            if (error.response) {
-                console.log(error.response.status);
-            }
+        } else {
+            console.log(133);
+            Store.addNotification({
+                title: "Failure!!",
+                message: "You add a category unsuccessfully!",
+                type: "danger",
+                insert: "top",
+                container: "top-center",
+                animationIn: ["animate__animated", "animate__fadeIn"],
+                animationOut: ["animate__animated", "animate__fadeOut"],
+                dismiss: {
+                    duration: 2000,
+                    onScreen: true
+                }
+            });
         }
     };
+    useEffect(() => {
+        console.log({ ...data, image });
+    }, [data])
     const normFile = (e) => {
         if (Array.isArray(e)) {
             return e;
@@ -97,25 +127,54 @@ function AddCategory() {
                 title="Create a new category"
                 bordered={false}
             >
-                <Form {...formItemLayout} style={{ maxWidth: 600 }} onSubmitCapture={handleSubmit} encType="multipart/form-data">
+                <Form {...formItemLayout} style={{ maxWidth: 600 }} onSubmitCapture={handleSubmit}
+                    onFinishFailed={onFinishFailed}
+                >
                     <Form.Item
                         label="Category ID"
                         hasFeedback
-                        validateStatus=""
-                        help="Maximum 200 characters"
+                        validateDebounce={1500}
+                        name="Category ID"
+                        rules={[
+                            {
+                                min: 5
+                            },
+                            {
+                                max: 10
+                            }
+                        ]}
+                        help="Maximum 10 characters"
                     >
                         <Input name="category_id" onChange={handleInput} />
                     </Form.Item>
                     <Form.Item
                         label="Name"
+                        name="Category Name"
                         hasFeedback
-                        validateStatus=""
-                        help="Maximum 200 characters"
+                        validateDebounce={1500}
+                        rules={[
+                            {
+                                min: 5
+                            },
+                            {
+                                max: 50
+                            }
+                        ]}
+                        help="Maximum 50 characters"
                     >
                         <Input name="name" onChange={handleInput} />
                     </Form.Item>
                     <Form.Item label="Description"
-                        validateStatus=""
+                        name="Description"
+                        validateDebounce={1500}
+                        rules={[
+                            {
+                                min: 5
+                            },
+                            {
+                                max: 300
+                            }
+                        ]}
                         hasFeedback help="Maximum 300 characters">
                         <Input.TextArea allowClear name="description" onChange={handleInput} />
                     </Form.Item>

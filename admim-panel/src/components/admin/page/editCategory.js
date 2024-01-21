@@ -21,9 +21,9 @@ import { Cloudinary } from "@cloudinary/url-gen";
 function EditCategory() {
     const navigate = useNavigate();
     const [form] = Form.useForm();
+    const [category, setCategory] = useState({});
     const [data, setData] = useState({});
     const [image, setImage] = useState("");
-    const [category, setCategory] = useState({});
     const { id } = useParams();
     const handleInput = (e) => {
         setData({ ...data, [e.target.name]: e.target.value });
@@ -32,6 +32,7 @@ function EditCategory() {
         try {
             const rs = await detail_category(id);
             setCategory(rs.data.category);
+            setData(rs.data.category, rs.data.description)
             if (rs.status !== 200) {
                 console.log(rs.statusText)
             }
@@ -42,6 +43,10 @@ function EditCategory() {
         }
 
     }
+    const onFinishFailed = (errorInfo) => {
+        return errorInfo;
+    };
+
     useEffect(() => {
         category_detail();
     }, [])
@@ -59,43 +64,60 @@ function EditCategory() {
     });
     const handleSubmit = async (e) => {
         e.preventDefault();
-        try {
-            const res = await edit_category(id, { ...data, image });
-            if (res.status === 200) {
-                Store.addNotification({
-                    title: "Sucess!!",
-                    message: "You edit a category successfully!",
-                    type: "success",
-                    insert: "top",
-                    container: "top-center",
-                    animationIn: ["animate__animated", "animate__fadeIn"],
-                    animationOut: ["animate__animated", "animate__fadeOut"],
-                    dismiss: {
-                        duration: 2000,
-                        onScreen: true
-                    }
-                });
-                navigate("/category")
+        if (!onFinishFailed) {
+            try {
+                const res = await edit_category(id, { ...data, image });
+                if (res.status === 200) {
+                    Store.addNotification({
+                        title: "Sucess!!",
+                        message: "You edit a category successfully!",
+                        type: "success",
+                        insert: "top",
+                        container: "top-center",
+                        animationIn: ["animate__animated", "animate__fadeIn"],
+                        animationOut: ["animate__animated", "animate__fadeOut"],
+                        dismiss: {
+                            duration: 2000,
+                            onScreen: true
+                        }
+                    });
+                    navigate("/category")
+                }
+                else {
+                    Store.addNotification({
+                        title: "Failure!!",
+                        message: "You edit a category unsuccessfully!",
+                        type: "danger",
+                        insert: "top",
+                        container: "top-center",
+                        animationIn: ["animate__animated", "animate__fadeIn"],
+                        animationOut: ["animate__animated", "animate__fadeOut"],
+                        dismiss: {
+                            duration: 2000,
+                            onScreen: true
+                        }
+                    });
+                }
+            } catch (error) {
+                if (error.response) {
+                    console.log(error.response.status);
+                }
             }
-            else {
-                Store.addNotification({
-                    title: "Failure!!",
-                    message: "You edit a category unsuccessfully!",
-                    type: "danger",
-                    insert: "top",
-                    container: "top-center",
-                    animationIn: ["animate__animated", "animate__fadeIn"],
-                    animationOut: ["animate__animated", "animate__fadeOut"],
-                    dismiss: {
-                        duration: 2000,
-                        onScreen: true
-                    }
-                });
-            }
-        } catch (error) {
-            if (error.response) {
-                console.log(error.response.status);
-            }
+        }
+        else {
+            Store.addNotification({
+                title: "Failure!!",
+                message: "You edit a category unsuccessfully!",
+                type: "danger",
+                insert: "top",
+                container: "top-center",
+                animationIn: ["animate__animated", "animate__fadeIn"],
+                animationOut: ["animate__animated", "animate__fadeOut"],
+                dismiss: {
+                    duration: 2000,
+                    onScreen: true
+                }
+            });
         }
     };
 
@@ -133,20 +155,38 @@ function EditCategory() {
             >
                 <Form {...formItemLayout} style={{ maxWidth: 600 }} onSubmitCapture={handleSubmit}
                     form={form}
+                    onFinishFailed={onFinishFailed}
                 >
                     <Form.Item
                         label="Name"
                         hasFeedback
-                        validateStatus=""
-                        help="Maximum 200 characters"
                         name="name"
+                        validateDebounce={1500}
+                        rules={[
+                            {
+                                min: 5
+                            },
+                            {
+                                max: 50
+                            }
+                        ]}
+                        help="Maximum 50 characters"
                     >
-                        <Input onChange={handleInput} defaultValue='{category.name}' name="name" />
+                        <Input onChange={handleInput} name="name" />
                     </Form.Item>
-                    <Form.Item label="Description"
-                        validateStatus=""
+                    <Form.Item
+                        label="Description"
                         hasFeedback help="Maximum 300 characters"
                         name="description"
+                        validateDebounce={1500}
+                        rules={[
+                            {
+                                min: 5
+                            },
+                            {
+                                max: 300
+                            }
+                        ]}
                     >
                         <Input.TextArea allowClear onChange={handleInput} name="description" defaultValue={category.description} />
                     </Form.Item>
