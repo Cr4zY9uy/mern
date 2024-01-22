@@ -599,7 +599,9 @@ app.get("/order_paginate", async (req, res) => {
             discount: order.discount,
             other_fee: order.other_fee,
             received: order.received,
-            note: order.note
+            balance: order.balance,
+            note: order.note,
+            createdAt: order.createdAt
         }));
         return res.status(200).json({ order_list, total_page: total_page, total_order: dataAll.length, page: page });
     } catch (error) {
@@ -700,7 +702,9 @@ app.get("/order/:id", async function (req, res) {
                 discount: data.discount,
                 other_fee: data.other_fee,
                 received: data.received,
-                note: data.note
+                note: data.note,
+                balance: data.balance,
+                createdAt: data.createdAt
             };
             return res.status(200).json({ order });
         }
@@ -722,6 +726,27 @@ app.delete("/order/delete/:id", checkAuth, async function (req, res) {
         return res.status(400).json({ message: error.message });
     }
 })
+app.delete("/order/delete_product/:order_id", checkAuth, async function (req, res) {
+    try {
+        const order_id = req.params.order_id;
+        const product_id = req.query.product_id;
+
+        const data = await order_model.findOneAndUpdate(
+            { order_id: order_id },
+            { $pull: { products: { product_id: product_id } } },
+            { new: true }
+        );
+
+        if (data) {
+            return res.status(200).json({ message: "Product removed from order successfully", order: data });
+        } else {
+            return res.status(404).json({ message: "Order not found" });
+        }
+    } catch (error) {
+        return res.status(400).json({ message: error.message });
+    }
+});
+
 app.delete("/product/delete_all", checkAuth, async function (req, res) {
     try {
         const data = await product_model.deleteMany({ _id: { $ne: null } });

@@ -4,6 +4,7 @@ import { Breadcrumb, Button } from "react-bootstrap";
 import { NavLink } from "react-router-dom";
 import Product_List from "../layout/product_list";
 function Shop() {
+    document.title = "Shop";
     return (
         <div className="shop">
             <Breadcrumb>
@@ -62,7 +63,7 @@ function Shop() {
                             <Button variant="outline-warning"><i class="bi bi-cart-check-fill"></i>Add to cart</Button>
                         </div>
                     </div>
-                    <Pagination style={{ textAlign: "center",paddingTop:70 }} defaultCurrent={1} total={50} pageSize={9} />
+                    <Pagination style={{ textAlign: "center", paddingTop: 70 }} defaultCurrent={1} total={50} pageSize={9} />
                 </div>
             </div>
         </div>

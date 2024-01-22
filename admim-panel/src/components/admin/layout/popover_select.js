@@ -1,8 +1,8 @@
 import "./../style/popover_select.css";
 import { Popover, OverlayTrigger } from "react-bootstrap";
 import { Form, Button, Space, Select } from "antd";
-function Popover_Select() {
-    const { Option } = Select;
+function Popover_Select(props) {
+    const info = props.info;
 
     const popover_right = (
         <Popover id="popover-select">
@@ -29,7 +29,7 @@ function Popover_Select() {
     );
     return (
         <OverlayTrigger trigger="click" placement="bottom" overlay={popover_right} rootClose={true}>
-            <Button type="link">Mark</Button>
+            <Button type="link">{info}</Button>
         </OverlayTrigger>
     );
 }

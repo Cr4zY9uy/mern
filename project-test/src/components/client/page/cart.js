@@ -9,6 +9,7 @@ import { AdvancedImage } from '@cloudinary/react';
 import { fill } from '@cloudinary/url-gen/actions/resize';
 import { Store } from 'react-notifications-component';
 function Cart(props) {
+    document.title = "Cart";
     const navigate = useNavigate();
     const cart = props.state.cart;
     const [quantities, setQuantities] = useState(cart.map(item => item.quantity));

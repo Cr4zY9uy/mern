@@ -8,6 +8,7 @@ import 'owl.carousel/dist/assets/owl.theme.default.css';
 import { paginate_product, product_hot } from "../../../services/product_service";
 import { useEffect, useState } from "react";
 function Home() {
+    document.title = "Home";
     const [product_status, setProductHot] = useState([]);
     const [product_new, setProductNew] = useState([]);
     const product_hot_list = async () => {

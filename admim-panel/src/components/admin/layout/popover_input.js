@@ -3,6 +3,7 @@ import { Popover, OverlayTrigger } from "react-bootstrap";
 import { Form, Button, Space, Input } from "antd";
 function Popover_Input(props) {
     const data = props.info;
+    const price = props.info_price;
     const popover_right = (
         <Popover id="popover-input">
             <Popover.Header as="h3">First name:</Popover.Header>
@@ -13,7 +14,7 @@ function Popover_Input(props) {
                         validateStatus=""
                         help="Maximum 200 characters"
                     >
-                        <Input />
+                        <Input value={data} />
                     </Form.Item>
                     <Space>
                         <Button onClick={() => document.body.click()} className="saveBtn"><i class="bi bi-check-lg"></i></Button>
@@ -25,7 +26,7 @@ function Popover_Input(props) {
     );
     return (
         <OverlayTrigger trigger="click" placement="right" overlay={popover_right} rootClose={true}>
-            <Button type="link">{data}</Button>
+            <Button type="link">{data ? data : price+'$'}</Button>
         </OverlayTrigger>
     );
 }

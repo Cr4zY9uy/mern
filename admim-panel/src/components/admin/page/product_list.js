@@ -14,6 +14,7 @@ import { fill } from '@cloudinary/url-gen/actions/resize';
 import Delete_Modal from '../layout/modal_del';
 import { Pagination } from 'antd';
 function Product_List() {
+    document.title = "Product list";
     const [type, setType] = useState("");
     const [product, setProduct] = useState([]);
     const [totalProducts, setTotalProducts] = useState(0);
@@ -72,7 +73,7 @@ function Product_List() {
     useEffect(() => {
         product_list();
         setType("product")
-    }, [delStatus,page])
+    }, [delStatus, page])
     const showModal = () => {
         setIsModalOpen(!isModalOpen);
     };
@@ -166,8 +167,9 @@ function Product_List() {
                     })}
                 </tbody>
             </Table>
-            <Pagination total={totalProducts}
-                pageSize={8}
+            <Pagination
+                total={totalProducts}
+                pageSize={9}
                 current={page}
                 onChange={(page) => setPage(page)} />
             <Delete_Modal status={isModalOpen} onOk={handleModalOk} onCancel={handleModalCancel} type_del={type} id_del={delID} onDel={onDelete} />

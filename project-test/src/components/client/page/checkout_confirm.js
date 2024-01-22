@@ -146,7 +146,7 @@ function Checkout_Confirm(props) {
                                         <th>
                                             Tax
                                         </th>
-                                        <td>{subTotal * 0.01}$</td>
+                                        <td>{Math.ceil(subTotal * 0.01)}$</td>
                                     </tr>
                                     <tr>
                                         <th>
@@ -172,7 +172,7 @@ function Checkout_Confirm(props) {
                                 <Button variant='secondary' onClick={() => { navigate("/cart") }}>
                                     back to cart
                                 </Button>
-                                <Button variant='warning' onClick={handleSubmit} disabled={order}>
+                                <Button variant='warning' onClick={handleSubmit} disabled={!order}>
                                     confirm
                                 </Button>
 

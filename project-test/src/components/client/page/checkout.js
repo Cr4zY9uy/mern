@@ -9,6 +9,7 @@ import { fill } from '@cloudinary/url-gen/actions/resize';
 import { Store } from "react-notifications-component";
 import ORDER_ACTION from "../../../redux/order/order_action";
 function Checkout(props) {
+    document.title = "Check out";
     const cart = props.state[0].cart;
     const order = props.state[1].order;
     const navigate = useNavigate();
@@ -186,7 +187,7 @@ function Checkout(props) {
                                 <Form.Label>Payment method</Form.Label>
                                 <Row>
                                     <Col name='payment' className='payment active' data-value='Credit card' onClick={(e) => changeActivePayment(e)}>
-                                        <div className='credit'><div><i className="bi bi-credit-card-2-back-fill"></i><span>Credit </span></div><i className="bi bi-check2-circle"></i></div>
+                                        <div className='credit'><div><i className="bi bi-credit-card-2-back-fill"></i><span>Credit</span></div><i className="bi bi-check2-circle"></i></div>
                                     </Col>
                                     <Col name='payment' className='payment' data-value='Paypal' onClick={(e) => changeActivePayment(e)}>
                                         <div className='paypal'><div><i className="bi bi-paypal"></i><span>Paypal</span></div><i className="bi bi-check2-circle"></i></div>
@@ -224,7 +225,7 @@ function Checkout(props) {
                                         <th>
                                             Tax
                                         </th>
-                                        <td>{subTotal * 0.01}$</td>
+                                        <td>{Math.ceil(subTotal * 0.01)}$</td>
                                     </tr>
                                     <tr>
 

@@ -19,6 +19,7 @@ import { Store } from "react-notifications-component";
 import PRODUCT_ACTION from "../../../redux/product/product_action";
 function ProductDetail(props) {
     const { id } = useParams();
+    document.title = "Product";
     const [product, setProduct] = useState({});
     const [productRelated, setProductRelated] = useState([]);
     const [quantity, setQuantity] = useState(1);
@@ -74,6 +75,7 @@ function ProductDetail(props) {
         try {
             const rs = await product_detail(id);
             setProduct(rs.data.product);
+
         }
         catch (error) {
             console.log(error.message);

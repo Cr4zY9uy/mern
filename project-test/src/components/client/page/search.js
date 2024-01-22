@@ -7,6 +7,7 @@ import Banner_Big from "../layout/banner_big";
 import { useEffect, useState } from "react";
 import { product_by_code, product_by_name } from "../../../services/product_service";
 function Search() {
+    document.title = "Search";
     const { input } = useParams();
     const { option } = useParams();
     const [totalProducts, setTotalProducts] = useState(0);

@@ -14,6 +14,8 @@ import { Store } from 'react-notifications-component';
 import Delete_Modal from '../layout/modal_del';
 import { Modal } from 'antd';
 function Category_List() {
+    document.title="Category list";
+
     const [type, setType] = useState("");
     const [delID, setDelID] = useState("");
     const [category, setCategory] = useState([]);

@@ -5,6 +5,7 @@ import { NavLink } from "react-router-dom";
 function Order_Success(props) {
     const orderList = props.state.order;
     const order = orderList[orderList.length - 1];
+    document.title = "Order success";
     return (
         <div className="order_success container">
             <Breadcrumb>

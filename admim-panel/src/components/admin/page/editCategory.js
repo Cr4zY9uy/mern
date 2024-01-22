@@ -149,8 +149,7 @@ function EditCategory() {
             <h2 className='caption'><FormOutlined />Edit category</h2>
             <Card
                 title="Edit a  category"
-                bordered={false}
-            >
+                bordered={false}>
                 <Form {...formItemLayout} style={{ maxWidth: 600 }} onSubmitCapture={handleSubmit}
                     form={form}
                     onFinishFailed={onFinishFailed}
@@ -186,7 +185,7 @@ function EditCategory() {
                             }
                         ]}
                     >
-                        <Input.TextArea allowClear onChange={handleInput} name="description" defaultValue={category.description} />
+                        <Input.TextArea allowClear onChange={handleInput} name="description" />
                     </Form.Item>
                     <Form.Item label="Initial image" className="imageInitial">
                         <AdvancedImage cldImg={cld.image(category.image).resize(fill().width(100).height(100))} />

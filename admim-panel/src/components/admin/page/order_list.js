@@ -9,7 +9,9 @@ import { useEffect, useState } from 'react';
 import { Store } from 'react-notifications-component';
 import { delete_order_all, list_order } from '../../../services/order_service';
 import Delete_Modal from '../layout/modal_del';
+import convertToDate from '../../../functions/convertDate';
 function Order_List() {
+    document.title = "Order list";
     const [type, setType] = useState("");
     const [delID, setDelID] = useState("");
     const [order, setOrder] = useState([]);
@@ -17,6 +19,7 @@ function Order_List() {
     const navigate = useNavigate();
     const [delStatus, setDelStatus] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
+
     const cate_list = async () => {
         try {
             const rs = await list_order(page);
@@ -66,7 +69,8 @@ function Order_List() {
     useEffect(() => {
         cate_list();
         setType("order");
-    }, [isModalOpen])
+        console.log(order);
+    }, [delStatus])
     const showModal = () => {
         setIsModalOpen(true);
     };
@@ -123,24 +127,22 @@ function Order_List() {
                             <td>{item.email}</td>
                             <td>
                                 {
-                                    item.products.reduce((total, product) => total + product.price * product.qty, 0)
+                                    item.products.reduce((total, product) => total + product.price * product.quantity, 0)
                                 }
                             </td>
-                            <td>{item.shipping_cost}</td>
-                            <td>{item.discount}</td>
+                            <td>{item.shipping_cost}$</td>
+                            <td>{item.discount}$</td>
                             <td>
-                                {
-                                    item.products.reduce((tax, product) => tax + product.tax, 0)
-                                }
+                                {item.products[0].tax}$
                             </td>
                             <td>
                                 {
-                                    item.shipping_cost + item.products.reduce((tax, product) => tax + product.tax + product.price * product.qty, 0)
-                                }
+                                    item.shipping_cost + item.products.reduce((tax, product) => (1 + product.tax) * product.price * product.quantity, 0)
+                                }$
                             </td>
                             <td>{item.order_status}</td>
                             <td>{item.payment_method}</td>
-                            <td>{item.createdAt}</td>
+                            <td>{convertToDate(item.createdAt)}</td>
                             <td>
                                 <Button variant='danger' style={{ marginRight: "10px" }} onClick={() => {
                                     showModal();

@@ -63,3 +63,7 @@
 .edit_order_panel table th {
     vertical-align: middle;
 }
+
+.edit_order_panel form {
+    width: 100% !important;
+}

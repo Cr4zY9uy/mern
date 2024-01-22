@@ -138,7 +138,6 @@ function EditProduct() {
             form.setFieldValue("qty", product.qty);
         }
     }, [product])
-    console.log(product);
     const handleImage = (file) => {
         const reader = new FileReader();
         reader.onload = (e) => {
