@@ -1,7 +1,55 @@
+import { useEffect, useState } from "react";
 import "../style/checkout.css";
 import { Breadcrumb, Table, Col, Row, Form, Button } from "react-bootstrap";
-import { NavLink } from "react-router-dom";
-function Checkout() {
+import { connect } from "react-redux";
+import { NavLink, useNavigate } from "react-router-dom";
+import { Cloudinary } from '@cloudinary/url-gen';
+import { AdvancedImage } from '@cloudinary/react';
+import { fill } from '@cloudinary/url-gen/actions/resize';
+import { Store } from "react-notifications-component";
+import ORDER_ACTION from "../../../redux/order/order_action";
+function Checkout(props) {
+    const cart = props.state[0].cart;
+    const order = props.state[1].order;
+    const navigate = useNavigate();
+    const subTotal = cart.reduce((total, item) => { return total + item.price * (1 - item.price_promotion) * item.quantity }, 0)
+    const [data, setData] = useState({});
+    const [payment_method, setPayment] = useState("Credit card");
+    const [shipping_method, setShipping] = useState("Free");
+    const shippingCost = {
+        Free: 0,
+        Standard: 50,
+        Express: 70
+    }
+    const items = cart.map((product) => ({
+        product_id: product.product_id,
+        title: product.title,
+        thumbnail: product.thumbnail,
+        quantity: product.quantity,
+        price: product.price,
+        price_promotion: product.price_promotion,
+    }))
+    const items_tax = items.map(obj => ({ ...obj, tax: 0.01 }))
+    function generateRandomString(length) {
+        const characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let randomString = '';
+        for (let i = 0; i < length; i++) {
+            const randomIndex = Math.floor(Math.random() * characters.length);
+            randomString += characters.charAt(randomIndex);
+        }
+
+        return randomString;
+    }
+    const order_id = generateRandomString(10);
+    useEffect(() => {
+        // console.log({ ...data, order_id, payment, shipping });
+        console.log(props.state);
+    }, [])
+    const cld = new Cloudinary({
+        cloud: {
+            cloudName: 'dv7ni8uod'
+        }
+    });
     const changeActivePayment = (e) => {
         const clickedOption = e.currentTarget;
         document.querySelectorAll('.payment').forEach(option => {
@@ -9,7 +57,7 @@ function Checkout() {
         });
         clickedOption.classList.add('active');
         const selectedPayment = clickedOption.getAttribute('data-value');
-        console.log(selectedPayment);
+        setPayment(selectedPayment);
     }
     const changeActiveShipping = (e) => {
         const clickedOption = e.currentTarget;
@@ -18,7 +66,47 @@ function Checkout() {
         });
         clickedOption.classList.add('active');
         const selectedShipping = clickedOption.getAttribute('data-value');
-        console.log(selectedShipping);
+        setShipping(selectedShipping);
+    }
+    const hanleInput = (e) => {
+        setData({ ...data, [e.target.name]: e.target.value })
+    }
+    const handleSubmit = (e) => {
+        const submitData = { ...data, order_id, payment_method, shipping_method, products: items_tax, shipping_cost: shippingCost[shipping_method] };
+        if (!data.first_name || !data.last_name || !data.email || !data.phone || !data.address || !data.country || !items) {
+            Store.addNotification({
+                title: "Failure!!",
+                message: "You add an order unsuccessfully!",
+                type: "danger",
+                insert: "top",
+                container: "top-right",
+                animationIn: ["animate__animated", "animate__fadeIn"],
+                animationOut: ["animate__animated", "animate__fadeOut"],
+                dismiss: {
+                    duration: 1500,
+                    onScreen: true
+                }
+            });
+        }
+        else {
+            order.push(submitData);
+            props.addToOrder(order);
+            Store.addNotification({
+                title: "Sucess!!",
+                message: "You add an order successfully!",
+                type: "success",
+                insert: "top",
+                container: "top-right",
+                animationIn: ["animate__animated", "animate__fadeIn"],
+                animationOut: ["animate__animated", "animate__fadeOut"],
+                dismiss: {
+                    duration: 1500,
+                    onScreen: true
+                }
+            });
+            navigate("/checkout_confirm");
+        }
+
     }
     return (
         <div className="checkout_page container">
@@ -41,33 +129,20 @@ function Checkout() {
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td><img src='./data/fruits/apple1.png' alt='apple' width={50} height={50} />Mark</td>
-                        <td>60$</td>
-                        <td>
-                            10
-                        </td>
-                        <td>100$</td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td><img src='./data/fruits/apple2.png' alt='apple' width={50} height={50} />Jacob</td>
-                        <td>60$</td>
-                        <td>
-                            10
-                        </td>
-                        <td>100$</td>
-                    </tr>
-                    <tr>
-                        <td>3</td>
-                        <td><img src='./data/fruits/apple3.png' alt='apple' width={50} height={50} />Larry the Bird</td>
-                        <td>60$</td>
-                        <td>
-                            10
-                        </td>
-                        <td>100$</td>
-                    </tr>
+                    {cart.map((item, index) => {
+                        return <tr>
+                            <td>{index + 1}</td>
+                            <td>
+                                <AdvancedImage cldImg={cld.image(item.thumbnail).resize(fill().width(50).height(50))} />
+                                {item.title}</td>
+                            <td>{item.price * (1 - item.price_promotion)}$</td>
+                            <td>
+                                {item.quantity}
+                            </td>
+                            <td>{item.price * (1 - item.price_promotion) * item.quantity}$</td>
+                        </tr>
+                    })}
+
                 </tbody>
             </Table>
             <div className="items pt-5">
@@ -78,11 +153,11 @@ function Checkout() {
                                 <Row>
                                     <Col>
                                         <Form.Label><i class="bi bi-person-fill"></i>First name</Form.Label>
-                                        <Form.Control type="text" name='first_name' required minLength={6} />
+                                        <Form.Control type="text" name='first_name' required minLength={6} onChange={hanleInput} />
                                     </Col>
                                     <Col>
                                         <Form.Label><i class="bi bi-person-fill"></i>Last name</Form.Label>
-                                        <Form.Control type="text" name='last_name' required minLength={6} />
+                                        <Form.Control type="text" name='last_name' required minLength={6} onChange={hanleInput} />
                                     </Col>
                                 </Row>
                             </Form.Group>
@@ -90,25 +165,25 @@ function Checkout() {
                                 <Row>
                                     <Col>
                                         <Form.Label><i class="bi bi-telephone-fill"></i>Phone</Form.Label>
-                                        <Form.Control type="text" name='phone' required pattern='[0-9]{10}' />
+                                        <Form.Control type="text" name='phone' required pattern='[0-9]{10}' onChange={hanleInput} />
                                     </Col>
                                     <Col>
                                         <Form.Label><i class="bi bi-envelope-fill"></i>Email</Form.Label>
-                                        <Form.Control type="email" name='email' required />
+                                        <Form.Control type="email" name='email' required onChange={hanleInput} />
                                     </Col>
                                 </Row>
                             </Form.Group>
                             <Form.Group className="mb-3" >
                                 <Form.Label><i class="bi bi-person-lines-fill"></i>Address</Form.Label>
-                                <Form.Control type="text" name='address' required />
+                                <Form.Control type="text" name='address' required onChange={hanleInput} />
                             </Form.Group>
                             <Form.Group className="mb-3" >
                                 <Form.Label><i class="bi bi-globe2"></i>Country</Form.Label>
-                                <Form.Control type="text" name='country' required />
+                                <Form.Control type="text" name='country' required onChange={hanleInput} />
                             </Form.Group>
                             <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
                                 <Form.Label><i class="bi bi-journal-medical"></i>Note</Form.Label>
-                                <Form.Control as="textarea" rows={3} name="note" />
+                                <Form.Control as="textarea" rows={3} name="note" onChange={hanleInput} />
                             </Form.Group>
                             <Form.Group>
                                 <Form.Label>Payment method</Form.Label>
@@ -145,26 +220,26 @@ function Checkout() {
                                     <tr>
                                         <th>Subtotal</th>
                                         <td>
-                                            10$
+                                            {subTotal}$
                                         </td>
                                     </tr>
                                     <tr>
                                         <th>
                                             Tax
                                         </th>
-                                        <td>100$</td>
+                                        <td>{subTotal * 0.01}$</td>
                                     </tr>
                                     <tr>
 
                                         <th>
                                             Total
                                         </th>
-                                        <th>100$</th>
+                                        <th>{subTotal * 1.01}$</th>
                                     </tr>
                                 </tbody>
                             </Table>
                             <div className='wrap_btn'>
-                                <Button variant='warning'>
+                                <Button variant='warning' onClick={handleSubmit}>
                                     Checkout
                                 </Button>
                             </div>
@@ -175,4 +250,17 @@ function Checkout() {
         </div>
     );
 }
-export default Checkout;
+const mapStateToProps = (state, ownState) => {
+    return {
+        state: [state.cart_reducer, state.order_reducer]
+    }
+}
+const mapDispatchToProps = (dispatch) => {
+    return {
+        addToOrder: (order) => {
+            dispatch({ type: ORDER_ACTION.ADD_ORDER, payload: order });
+        }
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Checkout); 

@@ -1,9 +1,9 @@
 import "./../style/banner_big.css"
 
-function Banner_Big() {
+function Banner_Big(props) {
     return (
         <div className="banner_big">
-            <h1>APPLE 1</h1>
+            <h1>{props.info}</h1>
         </div>
     );
 }

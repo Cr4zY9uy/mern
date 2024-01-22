@@ -95,9 +95,7 @@ function AddProduct() {
                     });
                 }
             } catch (error) {
-                if (error.response) {
-                    console.log(error.response.status);
-                }
+                console.log(error.message);
             }
         }
         else {

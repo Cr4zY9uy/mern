@@ -1,17 +1,17 @@
 import PRODUCT_ACTION from "./product_action";
 const updateLocalStorage = (state) => {
-    localStorage.setItem("product", JSON.stringify(state));
+    localStorage.setItem("products", JSON.stringify(state));
     return state;
 }
 const STATE = {
-    product: []
+    products: []
 }
-const initData = localStorage.getItem("product") ? JSON.parse(localStorage.getItem("product")) : STATE;
+const initData = localStorage.getItem("products") ? JSON.parse(localStorage.getItem("products")) : STATE;
 
 
 const product_reducer = (state = initData, action) => {
     switch (action.type) {
-        case PRODUCT_ACTION.ADD_PRODUCT: return updateLocalStorage({ ...state, product: action.payload });
+        case PRODUCT_ACTION.ADD_PRODUCT: return updateLocalStorage({ ...state, products: action.payload });
         default: return state;
     }
 }

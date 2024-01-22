@@ -19,8 +19,8 @@ import { ReactNotifications } from 'react-notifications-component';
 function App() {
   return (
     <>
-      <Header />
       <ReactNotifications />
+      <Header />
       <Routes>
         <Route path='/' element={<Home />} />
         <Route path='/search/:option/:input' element={<Search />} />

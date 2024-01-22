@@ -59,3 +59,7 @@
 .product button:hover {
     color: rgb(255, 255, 255);
 }
+.product .status{
+    width: 100%;
+    
+}

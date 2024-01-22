@@ -16,13 +16,13 @@ import { Cloudinary } from '@cloudinary/url-gen';
 import { AdvancedImage } from '@cloudinary/react';
 
 import { Store } from "react-notifications-component";
+import PRODUCT_ACTION from "../../../redux/product/product_action";
 function ProductDetail(props) {
     const { id } = useParams();
     const [product, setProduct] = useState({});
     const [productRelated, setProductRelated] = useState([]);
     const [quantity, setQuantity] = useState(1);
     const minus = () => {
-        // Update the quantity state, ensuring it doesn't go below 0
         setQuantity((prevQuantity) => Math.max(prevQuantity - 1, 0));
         if (quantity === 0) setQuantity(0)
     };
@@ -44,13 +44,11 @@ function ProductDetail(props) {
     ];
     const addToCart = () => {
         const cart = props.state[0].cart;
-
         const existingItemIndex = cart.findIndex(cartItem => cartItem.product_id === product.product_id);
-
         if (existingItemIndex !== -1) {
-            cart[existingItemIndex].quantity += 1;
+            cart[existingItemIndex].quantity += quantity;
         } else {
-            cart.push({ ...product, quantity: 1 });
+            cart.push({ ...product, quantity: quantity });
         }
         props.addToCart(cart);
         Store.addNotification({
@@ -66,6 +64,11 @@ function ProductDetail(props) {
                 onScreen: true
             }
         });
+    };
+    const addToProduct = () => {
+        const products = props.state[1].products;
+        products.push({ ...product });
+        props.addToCart(products);
     };
     const load_product = async () => {
         try {
@@ -95,7 +98,7 @@ function ProductDetail(props) {
     }, [product.category_name])
     return (
         <div>
-            <Banner_Big />
+            <Banner_Big info={product.title} />
             <div className="product_detail-client container">
                 <Breadcrumb>
                     <Breadcrumb.Item>
@@ -107,9 +110,9 @@ function ProductDetail(props) {
                 </Breadcrumb>
                 <div className="detail d-flex">
                     <div className="img-group last_view d-flex flex-column">
-                        <img src="./data/fruits/apple1.png" alt="apple1" />
-                        <img src="./data/fruits/apple1.png" alt="apple1" />
-                        <img src="./data/fruits/apple1.png" alt="apple1" />
+                        <img src="/data/fruits/apple1.png" alt="apple1" />
+                        <img src="/data/fruits/apple1.png" alt="apple1" />
+                        <img src="/data/fruits/apple1.png" alt="apple1" />
                     </div>
                     <div className="img-product">
                         <AdvancedImage cldImg={cld.image(product.thumbnail)} />
@@ -128,7 +131,7 @@ function ProductDetail(props) {
                         </div>
                         <div>
                             <div className='form-group d-flex align-items-center justify-content-start'>
-                                <input value={quantity} className="form-control quantity" style={{ textAlign: "center" }} />
+                                <input value={quantity} className="form-control quantity" style={{ textAlign: "center" }} readOnly />
                                 <div className="d-flex flex-column justify-content-between ms-2" style={{ height: "100%", width: "30%" }}>
                                     <Button variant="light" onClick={plus}>
                                         <PlusOutlined />
@@ -139,7 +142,7 @@ function ProductDetail(props) {
 
                                 </div>
                             </div>
-                            <Button variant="warning" style={{ width: "37.5%", height: "10vh", marginTop: 15 }} onClick={addToCart}> Add to cart</Button>
+                            <Button variant="warning" style={{ width: "37.5%", height: "10vh", marginTop: 15 }} disabled={product.qty === 0 ? true : false} onClick={addToCart}> Add to cart</Button>
                         </div>
                     </div>
                 </div>
@@ -158,13 +161,16 @@ function ProductDetail(props) {
 }
 const mapStateToProps = (state, ownProps) => {
     return {
-        state: [state.cart_reducer, state.favourite_reducer]
+        state: [state.cart_reducer, state.product_reducer]
     }
 }
 const mapDispatchToProps = (dispatch) => {
     return {
         addToCart: (cart) => {
-            dispatch({ type: CART_ACTION.UPDATE_CART, payload: cart });
+            dispatch({ type: CART_ACTION.ADD_CART, payload: cart });
+        },
+        addToProduct: (products) => {
+            dispatch({ type: PRODUCT_ACTION.ADD_PRODUCT, payload: products })
         }
     }
 }

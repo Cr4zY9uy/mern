@@ -16,10 +16,9 @@ function Product_LSView(props) {
         }
     });
     const addToCart = () => {
-        const cart = props.state[0].cart;
-
+        const cart = props.state.cart;
+        console.log(1);
         const existingItemIndex = cart.findIndex(cartItem => cartItem.product_id === product.product_id);
-
         if (existingItemIndex !== -1) {
             cart[existingItemIndex].quantity += 1;
         } else {
@@ -55,13 +54,13 @@ function Product_LSView(props) {
 }
 const mapStateToProps = (state, ownProps) => {
     return {
-        state: [state.cart_reducer, state.favourite_reducer]
+        state: state.cart_reducer
     }
 }
 const mapDispatchToProps = (dispatch) => {
     return {
         addToCart: (cart) => {
-            dispatch({ type: CART_ACTION.UPDATE_CART, payload: cart });
+            dispatch({ type: CART_ACTION.ADD_CART, payload: cart });
         }
     }
 }

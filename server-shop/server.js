@@ -544,7 +544,7 @@ app.get("/order_paginate", async (req, res) => {
         }
         const total_page = Math.ceil(dataAll.length / limit);
         const order_list = data.map((order) => ({
-            order_id: order_id,
+            order_id: order.order_id,
             first_name: order.first_name,
             last_name: order.last_name,
             phone: order.phone,
@@ -573,7 +573,7 @@ app.get("/order_paginate", async (req, res) => {
             received: order.received,
             note: order.note
         }));
-        return res.status(200).json({ order_list, total_page: total_page, total_product: dataAll.length, page: page });
+        return res.status(200).json({ order_list, total_page: total_page, total_order: dataAll.length, page: page });
     } catch (error) {
         return res.status(400).json({ message: error.message });
     }

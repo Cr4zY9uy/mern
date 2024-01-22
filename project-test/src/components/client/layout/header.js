@@ -3,8 +3,10 @@ import "./../style/header.css";
 import { useEffect, useState } from "react";
 import Modal_Search from "./modal_search";
 import { list_category } from "../../../services/category_service";
-function Header() {
+import { connect } from "react-redux";
+function Header(props) {
     const navigate = useNavigate();
+    const cart = props.state?.cart;
     const [searchView, setSearchView] = useState(false);
     const [category, setCategory] = useState([]);
     const toggleSearchView = () => {
@@ -55,7 +57,7 @@ function Header() {
                     </div>
                     <div>
                         <button><NavLink to={'/cart'}><i className="bi bi-cart3"></i></NavLink></button>
-                        <div className="qty">12</div>
+                        <div className="qty">{cart?.length ? cart?.length : '0'}</div>
                     </div>
                 </div>
 
@@ -64,4 +66,9 @@ function Header() {
         </header >
     );
 }
-export default Header;
+const mapStateToProps = (state, ownProps) => {
+    return {
+        state: state.cart_reducer
+    }
+}
+export default connect(mapStateToProps, null)(Header); 

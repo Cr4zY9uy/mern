@@ -14,11 +14,10 @@ function Product_List(props) {
       cloudName: 'dv7ni8uod'
     }
   });
+
   const addToCart = () => {
-    const cart = props.state[0].cart;
-
+    const cart = props.state.cart;
     const existingItemIndex = cart.findIndex(cartItem => cartItem.product_id === product.product_id);
-
     if (existingItemIndex !== -1) {
       cart[existingItemIndex].quantity += 1;
     } else {
@@ -39,9 +38,14 @@ function Product_List(props) {
       }
     });
   };
+
   return (
 
     <div className="product">
+      <div className="status">
+        <img src="/data/badge/new.png" alt="new" width={50} height={25} style={{ display: product.qty !== 0 ? "block" : "none" }} />
+        <img src="/data/badge/sold_out.png" alt="sold_out" width={50} height={25} style={{ display: product.qty === 0 ? "block" : "none" }} />
+      </div>
       <Link to={`/product/${product.product_id}`}>
         <AdvancedImage cldImg={cld.image(product.thumbnail).resize(fill().width(300).height(300))} />
       </Link>
@@ -50,20 +54,20 @@ function Product_List(props) {
         {product.price * (1 - parseFloat(product.price_promotion))}$
         {product.price_promotion === 0 ? "" : <span className="discount">{`${product.price}$`}</span>}
       </p>
-      <Button variant="outline-warning" onClick={addToCart}><i class="bi bi-cart-check-fill"></i>Add to cart</Button>
+      <Button variant="outline-warning" disabled={product.qty === 0 ? true : false} onClick={addToCart}><i class="bi bi-cart-check-fill"></i>Add to cart</Button>
     </div>
 
   );
 }
 const mapStateToProps = (state, ownProps) => {
   return {
-    state: [state.cart_reducer, state.favourite_reducer]
+    state: state.cart_reducer
   }
 }
 const mapDispatchToProps = (dispatch) => {
   return {
     addToCart: (cart) => {
-      dispatch({ type: CART_ACTION.UPDATE_CART, payload: cart });
+      dispatch({ type: CART_ACTION.ADD_CART, payload: cart });
     }
   }
 }
