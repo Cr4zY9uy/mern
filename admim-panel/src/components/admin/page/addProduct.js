@@ -60,7 +60,7 @@ function AddProduct() {
     }
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!onFinishFailed) {
+        if (onFinishFailed !== null) {
             try {
                 const res = await add_product({ ...data, image, category_name });
                 if (res.status === 201) {
@@ -80,6 +80,7 @@ function AddProduct() {
                     navigate("/product")
                 }
                 else {
+                    console.log(1022);
                     Store.addNotification({
                         title: "Failure!!",
                         message: "You add a product unsuccessfully!",
@@ -99,6 +100,7 @@ function AddProduct() {
             }
         }
         else {
+            console.log(1001);
             Store.addNotification({
                 title: "Failure!!",
                 message: "You add a product unsuccessfully!",

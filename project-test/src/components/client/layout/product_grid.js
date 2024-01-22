@@ -4,38 +4,22 @@ import { Cloudinary } from '@cloudinary/url-gen';
 import { fill } from '@cloudinary/url-gen/actions/resize';
 import { AdvancedImage } from '@cloudinary/react';
 import "./../style/product_grid.css";
-function Product_Grid() {
+function Product_Grid(props) {
+    const product = props.product;
     const cld = new Cloudinary({
         cloud: {
             cloudName: 'dv7ni8uod'
         }
     });
-    const myImage = cld.image('shop/xpnsepyssnwwueukiq6x');
-    myImage.resize(fill().width(250).height(250));
     return (
-        <div className="text-center">
-            <div className="searchResult row">
-                <div className="search_item col-4">
-                    <AdvancedImage cldImg={myImage} />
-
-                    <h4>Apple 1</h4>
-                    <p>10$<span className="discount">50$</span></p>
-                    <Button variant="outline-warning"><i class="bi bi-cart-check-fill"></i>Add to cart</Button>
-                </div>
-                <div className="search_item col-4">
-                    <img src="/data/fruits/pineapple1.png" alt="pineapple" />
-                    <h4>Apple 2</h4>
-                    <p>10$<span className="discount">50$</span></p>
-                    <Button variant="outline-warning"><i class="bi bi-cart-check-fill"></i>Add to cart</Button>
-                </div>
-                <div className="search_item col-4">
-                    <img src="/data/fruits/pineapple1.png" alt="pineapple" />
-                    <h4>Apple 2</h4>
-                    <p>10$<span className="discount">50$</span></p>
-                    <Button variant="outline-warning"><i class="bi bi-cart-check-fill"></i>Add to cart</Button>
-                </div>
-            </div>
+        <div className="search_item col-4">
+            <Link to={`/product/${product.product_id}`}><AdvancedImage cldImg={cld.image(product.thumbnail)} /></Link>
+            <h4>{product.title}</h4>
+            <p>  {product.price * (1 - parseFloat(product.price_promotion))}$
+                {product.price_promotion === 0 ? "" : <span className="discount">{`${product.price}$`}</span>}</p>
         </div>
+
+
     );
 }
 export default Product_Grid;

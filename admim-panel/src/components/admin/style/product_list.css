@@ -81,3 +81,9 @@
     max-width: 240px;
     min-width: 180px;
 }
+
+.product_list .ant-pagination{
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}

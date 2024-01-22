@@ -422,7 +422,7 @@ app.put("/product/edit/:id", async function (req, res) {
                     qty: data.qty,
                     category_name: data.category_name,
                     thumbnail: uploadedImage.public_id,
-                    images: [data.images],
+                    images: data.images,
                     price_promotion: data.price_promotion,
                     status: data.status
                 },
@@ -437,9 +437,9 @@ app.put("/product/edit/:id", async function (req, res) {
         return res.status(400).json({ message: error.message });
     }
 })
-app.get("/product", async function (req, res) {
+app.get("/product/detail/:id", async function (req, res) {
     try {
-        const product_id = req.query.id ? req.query.id : "";
+        const product_id = req.params.id;
         const data = await product_model.findOne({ product_id: product_id })
         if (data === null) {
             return res.status(400).json({ message: "Product no exists" });
@@ -453,7 +453,7 @@ app.get("/product", async function (req, res) {
                 qty: data.qty,
                 category_name: data.category_name,
                 thumbnail: data.thumbnail,
-                images: [data.images],
+                images: data.images,
                 price_promotion: data.price_promotion,
                 status: data.status
             };
@@ -463,28 +463,66 @@ app.get("/product", async function (req, res) {
         return res.status(400).json({ message: error.message });
     }
 })
-
-app.get("/product", async function (req, res) {
+app.get("/product_by_id/:id", async function (req, res) {
+    const limit = 9;
+    const page = parseInt(req.query.page) ? parseInt(req.query.page) : 1;
+    const skip = (page - 1) * limit;
+    const product_id = req.params.id ? req.params.id : "";
+    const encodeId = decodeURIComponent(product_id);
     try {
-        const name = req.query.name ? req.query.name : "";
-        const data = await product_model.findOne({ title: name })
+        const dataAll = await product_model.find({ product_id: { $regex: new RegExp(encodeId, 'i') } }).sort({ createdAt: -1 });
+        const data = dataAll.slice(skip, skip + limit);
+        const total_page = Math.ceil(dataAll.length / limit);
         if (data === null) {
             return res.status(400).json({ message: "Product no exists" });
         }
         else {
-            const product = {
-                product_id: data.product_id,
-                title: name,
-                price: data.price,
-                description: data.description,
-                qty: data.qty,
-                category_name: data.category_name,
-                thumbnail: data.thumbnail,
-                images: [data.images],
-                price_promotion: data.price_promotion,
-                status: data.status
-            };
-            return res.status(200).json({ product });
+            const product = data.map((item) => ({
+                product_id: item.product_id,
+                title: item.title,
+                price: item.price,
+                description: item.description,
+                qty: item.qty,
+                category_name: item.category_name,
+                thumbnail: item.thumbnail,
+                images: item.images,
+                price_promotion: item.price_promotion,
+                status: item.status
+            }));
+            return res.status(200).json({ product, total_page: total_page, total_product: dataAll.length, page: page });
+        }
+    } catch (error) {
+        return res.status(400).json({ message: error.message });
+    }
+})
+
+app.get("/product_by_name/:name", async function (req, res) {
+    const limit = 9;
+    const page = parseInt(req.query.page) ? parseInt(req.query.page) : 1;
+    const skip = (page - 1) * limit;
+    const name = req.params.name ? req.params.name : "";
+    const encodeTitle = decodeURIComponent(name);
+    try {
+        const dataAll = await product_model.find({ title: { $regex: new RegExp(encodeTitle, 'i') } }).sort({ createdAt: -1 });
+        const data = dataAll.slice(skip, skip + limit);
+        const total_page = Math.ceil(dataAll.length / limit);
+        if (data === null) {
+            return res.status(400).json({ message: "Product no exists" });
+        }
+        else {
+            const product = data.map((item) => ({
+                product_id: item.product_id,
+                title: item.title,
+                price: item.price,
+                description: item.description,
+                qty: item.qty,
+                category_name: item.category_name,
+                thumbnail: item.thumbnail,
+                images: item.images,
+                price_promotion: item.price_promotion,
+                status: item.status
+            }));
+            return res.status(200).json({ product, total_page: total_page, total_product: dataAll.length, page: page });
         }
     } catch (error) {
         return res.status(400).json({ message: error.message });
@@ -556,17 +594,7 @@ app.get("/order_paginate", async (req, res) => {
             payment_status: order.payment_status,
             shipping_status: order.shipping_status,
             order_status: order.order_status,
-            products: [
-                {
-                    product_id: order.products.product_id,
-                    title: order.products.title,
-                    price: order.products.price,
-                    qty: order.products.qty,
-                    thumbnail: order.products.thumbnail,
-                    price_promotion: order.products.price_promotion,
-                    tax: order.products.tax
-                }
-            ],
+            products: order.products,
             shipping_cost: order.shipping_cost,
             discount: order.discount,
             other_fee: order.other_fee,
@@ -655,7 +683,7 @@ app.get("/order/:id", async function (req, res) {
         }
         else {
             const order = {
-                product_id: product_id,
+                order_id: order_id,
                 first_name: data.first_name,
                 last_name: data.last_name,
                 phone: data.phone,
@@ -667,17 +695,7 @@ app.get("/order/:id", async function (req, res) {
                 payment_status: data.payment_status,
                 shipping_status: data.shipping_status,
                 order_status: data.order_status,
-                products: [
-                    {
-                        product_id: data.products.product_id,
-                        title: data.products.title,
-                        price: data.products.price,
-                        qty: data.products.qty,
-                        thumbnail: data.products.thumbnail,
-                        price_promotion: data.products.price_promotion,
-                        tax: data.products.tax
-                    }
-                ],
+                products: data.products,
                 shipping_cost: data.shipping_cost,
                 discount: data.discount,
                 other_fee: data.other_fee,

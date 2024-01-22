@@ -12,18 +12,21 @@ import { delete_product_all, paginate_product } from '../../../services/product_
 import { AdvancedImage } from '@cloudinary/react';
 import { fill } from '@cloudinary/url-gen/actions/resize';
 import Delete_Modal from '../layout/modal_del';
+import { Pagination } from 'antd';
 function Product_List() {
     const [type, setType] = useState("");
     const [product, setProduct] = useState([]);
+    const [totalProducts, setTotalProducts] = useState(0);
+    const [page, setPage] = useState(1);
     const navigate = useNavigate();
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [page, setPage] = useState(1);
     const [delID, setDelID] = useState("");
     const [delStatus, setDelStatus] = useState(false);
     const product_list = async () => {
         try {
             const rs = await paginate_product(page);
             setProduct(rs.data.product_list);
+            setTotalProducts(rs.data.total_product)
             if (rs.status !== 200) {
                 console.log(rs.statusText)
             }
@@ -69,8 +72,7 @@ function Product_List() {
     useEffect(() => {
         product_list();
         setType("product")
-        console.log(delStatus);
-    }, [delStatus])
+    }, [delStatus,page])
     const showModal = () => {
         setIsModalOpen(!isModalOpen);
     };
@@ -164,6 +166,10 @@ function Product_List() {
                     })}
                 </tbody>
             </Table>
+            <Pagination total={totalProducts}
+                pageSize={8}
+                current={page}
+                onChange={(page) => setPage(page)} />
             <Delete_Modal status={isModalOpen} onOk={handleModalOk} onCancel={handleModalCancel} type_del={type} id_del={delID} onDel={onDelete} />
         </div>
     );

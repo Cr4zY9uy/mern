@@ -15,12 +15,22 @@ import {
     Flex
 } from 'antd';
 import { Table } from "react-bootstrap";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Popover_Input from "../layout/popover_input";
 import Popover_Select from "../layout/popover_select";
+import { detail_order } from "../../../services/order_service";
+import { useParams } from "react-router";
 function EditOrder() {
     const [input, handleInput] = useState({});
-    
+    const { id } = useParams();
+    const [order, setOrder] = useState({});
+    const load_order = async () => {
+        const rs = await detail_order(id);
+        setOrder(rs.data.order);
+    }
+    useEffect(() => {
+        load_order();
+    }, [])
     return (
         <div className="edit_order_panel container">
             <h2 className='caption'><FormOutlined />Order detail</h2>
@@ -35,35 +45,35 @@ function EditOrder() {
                                 <tr>
                                     <th>First name:</th>
                                     <td>
-                                        <Popover_Input />
+                                        <Popover_Input info={order.first_name} />
                                     </td>
                                 </tr>
                                 <tr>
                                     <th>Last name:</th>
                                     <td>
-                                        <Popover_Input />
+                                        <Popover_Input info={order.last_name} />
                                     </td>
                                 </tr>
                                 <tr>
                                     <th>Phone:</th>
                                     <td>
-                                        <Popover_Input />
+                                        <Popover_Input info={order.phone} />
                                     </td>
                                 </tr>
                                 <tr>
                                     <th>Email:</th>
-                                    <td>nguyentrongdatnd18@gmail.com</td>
+                                    <td>{order.email}</td>
                                 </tr>
                                 <tr>
                                     <th>Address:</th>
                                     <td>
-                                        <Popover_Input />
+                                        <Popover_Input info={order.address} />
                                     </td>
                                 </tr>
                                 <tr>
                                     <th>Country:</th>
                                     <td>
-                                        <Popover_Input />
+                                        <Popover_Input info={order.country} />
                                     </td>
                                 </tr>
                             </tbody>
@@ -150,19 +160,19 @@ function EditOrder() {
                                 <tr>
                                     <td>Shipping Standard:</td>
                                     <td>
-                                        <Popover_Input />
+                                        <Popover_Input info={order.shipping_cost} />
                                     </td>
                                 </tr>
                                 <tr>
                                     <td>Coupon/Discount</td>
                                     <td>
-                                        <Popover_Input />
+                                        <Popover_Input info={order?.coupon}/>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td>Other fee:</td>
                                     <td>
-                                        <Popover_Input />
+                                        <Popover_Input info={order.shipping_cost}/>
                                     </td>
                                 </tr>
                                 <tr>

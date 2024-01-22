@@ -2,6 +2,7 @@ import URL from "./url"
 import api from "./api";
 export const list_category = async () => {
     const url = URL.CATEGORY.ALL;
+
     try {
         const rs = await api.get(url);
         return rs;

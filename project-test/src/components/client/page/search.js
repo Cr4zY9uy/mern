@@ -4,10 +4,35 @@ import { NavLink, useParams } from "react-router-dom";
 import Product_Grid from "../layout/product_grid";
 import "./../style/search.css";
 import Banner_Big from "../layout/banner_big";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { product_by_code, product_by_name } from "../../../services/product_service";
 function Search() {
     const { input } = useParams();
+    const { option } = useParams();
+    const [totalProducts, setTotalProducts] = useState(0);
+    const [page, setPage] = useState(1);
+    const [product, setProduct] = useState([]);
+    const load_product = async () => {
+        let rs;
+        try {
+            if (option === "name") {
+                rs = await product_by_name(input, page);
+                setProduct(rs.data.product);
+                setTotalProducts(rs.data.total_product)
 
+            }
+            if (option === "code") {
+                rs = await product_by_code(input, page);
+                setProduct(rs.data.product);
+            }
+        } catch (err) {
+            console.log(err.message)
+        }
+
+    }
+    useEffect(() => {
+        load_product();
+    }, [option, input, page])
     return (
         <div className="search">
             <Banner_Big />
@@ -20,12 +45,18 @@ function Search() {
                         <NavLink to={'/search'}>SEARCH</NavLink>
                     </Breadcrumb.Item>
                 </Breadcrumb>
-                <div className="results_pagination"><p className=" text-left">Showing <b>1</b> - <b>10</b> results of <b>20</b> results</p></div>
-                <Product_Grid />
-                <Product_Grid />
-                <Product_Grid />
-
-                <Pagination defaultCurrent={1} total={50} pageSize={9} />
+                <div className="results_pagination">{product.length !== 0 ? <p className=" text-left">Showing <b>1</b> - <b>{product.length}</b> results of <b>{totalProducts}</b> results</p>
+                    : <p className=" text-left">Nothing to show</p>
+                }</div>
+                <div className="text-center">
+                    <div className="searchResult row">
+                        {product.map((item, index) => { return <Product_Grid product={item} key={index} /> })}
+                    </div>
+                </div>
+                <Pagination total={totalProducts}
+                    pageSize={8}
+                    current={page}
+                    onChange={(page) => setPage(page)} />
             </div>
         </div>
     );

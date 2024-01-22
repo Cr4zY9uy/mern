@@ -17,7 +17,7 @@ const order_schema = new mongoose.Schema({
             product_id: String,
             title: String,
             price: Number,
-            qty: Number,
+            quantity: Number,
             thumbnail: String,
             price_promotion: Number,
             tax: Number

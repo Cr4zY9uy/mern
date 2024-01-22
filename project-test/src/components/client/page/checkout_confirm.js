@@ -36,7 +36,8 @@ function Checkout_Confirm(props) {
                         onScreen: true
                     }
                 });
-                navigate("/order_success")
+                props.deleteCart();
+                navigate("/order_success");
             } else {
                 Store.addNotification({
                     title: "Failure!!",
@@ -102,7 +103,7 @@ function Checkout_Confirm(props) {
                                     <tr>
                                         <th>Name</th>
                                         <td>
-                                            {order.first_name + order.last_name}
+                                            {order.first_name + ' ' + order.last_name}
                                         </td>
                                     </tr>
                                     <tr>
@@ -171,7 +172,7 @@ function Checkout_Confirm(props) {
                                 <Button variant='secondary' onClick={() => { navigate("/cart") }}>
                                     back to cart
                                 </Button>
-                                <Button variant='warning' onClick={handleSubmit}>
+                                <Button variant='warning' onClick={handleSubmit} disabled={order}>
                                     confirm
                                 </Button>
 

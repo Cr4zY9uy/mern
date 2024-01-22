@@ -138,15 +138,15 @@ function Order_List() {
                                     item.shipping_cost + item.products.reduce((tax, product) => tax + product.tax + product.price * product.qty, 0)
                                 }
                             </td>
-                            <td>{item.order_status}1</td>
-                            <td>{item.payment_method}1</td>
-                            <td>{item.createdAt}1</td>
+                            <td>{item.order_status}</td>
+                            <td>{item.payment_method}</td>
+                            <td>{item.createdAt}</td>
                             <td>
                                 <Button variant='danger' style={{ marginRight: "10px" }} onClick={() => {
                                     showModal();
                                     setDelID(item.order_id)
                                 }}><i class="bi bi-trash-fill"></i></Button>
-                                <Button variant='warning' onClick={() => { navigate(`/category/edit/${item.category_id}`) }}><FormOutlined /></Button>
+                                <Button variant='warning' onClick={() => { navigate(`/order/edit/${item.order_id}`) }}><FormOutlined /></Button>
                             </td>
                         </tr>))
                     }

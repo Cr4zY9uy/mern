@@ -5,9 +5,9 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 function Modal_Search(props) {
     const { Option } = Select;
-    const [searchOption, setSearchOption] = useState("");
+    const [searchOption, setSearchOption] = useState("name");
 
-    const [searchInput, setSearch] = useState("name");
+    const [searchInput, setSearch] = useState("");
     const navigate = useNavigate();
     const handleOverlayClick = () => {
         // Close the modal if the overlay is clicked
@@ -18,7 +18,7 @@ function Modal_Search(props) {
         navigate(`/search/${searchOption}/${searchInput}`);
     }
     const inputSearch = useDebounce(searchInput, 2000);
-    useEffect(()     => {
+    useEffect(() => {
         console.log(inputSearch);
         console.log(searchOption);
     }, [inputSearch])

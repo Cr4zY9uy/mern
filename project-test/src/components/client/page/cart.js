@@ -105,7 +105,7 @@ function Cart(props) {
                 </tbody>
             </Table>
             <div className='wrap_btn'>
-                <Button variant='warning' onClick={checkout}>
+                <Button variant='warning' onClick={checkout} disabled={cart.length === 0}>
                     Checkout
                 </Button>
             </div>

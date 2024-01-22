@@ -41,10 +41,7 @@ function Checkout(props) {
         return randomString;
     }
     const order_id = generateRandomString(10);
-    useEffect(() => {
-        // console.log({ ...data, order_id, payment, shipping });
-        console.log(props.state);
-    }, [])
+
     const cld = new Cloudinary({
         cloud: {
             cloudName: 'dv7ni8uod'
@@ -239,7 +236,7 @@ function Checkout(props) {
                                 </tbody>
                             </Table>
                             <div className='wrap_btn'>
-                                <Button variant='warning' onClick={handleSubmit}>
+                                <Button variant='warning' onClick={handleSubmit} disable={cart.length === 0}>
                                     Checkout
                                 </Button>
                             </div>

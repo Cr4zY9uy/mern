@@ -38,14 +38,12 @@ function AddCategory() {
     }
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!onFinishFailed) {
-            if (!image) {
-
-            }
+        if (onFinishFailed !== null) {
             try {
 
                 const res = await add_category({ ...data, image });
                 if (res.status === 201) {
+
                     Store.addNotification({
                         title: "Sucess!!",
                         message: "You add a category successfully!",
@@ -82,6 +80,7 @@ function AddCategory() {
                 console.log(error.message);
             }
         } else {
+            console.log(1001);
             Store.addNotification({
                 title: "Failure!!",
                 message: "You add a category unsuccessfully!",

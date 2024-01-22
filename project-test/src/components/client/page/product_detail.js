@@ -11,7 +11,7 @@ import Banner_Big from "../layout/banner_big";
 import { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import CART_ACTION from "../../../redux/cart/cart_action";
-import { product_by_cate, product_by_code } from "../../../services/product_service";
+import { product_by_cate, product_by_code, product_detail } from "../../../services/product_service";
 import { Cloudinary } from '@cloudinary/url-gen';
 import { AdvancedImage } from '@cloudinary/react';
 
@@ -39,7 +39,7 @@ function ProductDetail(props) {
         {
             key: '1',
             label: 'Description',
-            children: 'Fruits are a diverse group of edible plant products that come in a wide variety of shapes, sizes, colors, and flavors. They are typically fleshy or juicy and contain seeds, although there are exceptions such as bananas. Fruits are not only delicious but also packed with essential nutrients like vitamins, minerals, and fiber. From common fruits like apples, oranges, and strawberries to more exotic ones like dragon fruit, durian, and jackfruit, there is a fruit to suit every taste preference. They can be enjoyed fresh, dried, juiced, or incorporated into a variety of recipes. Whether eaten as a snack, added to salads, or used in desserts, fruits are a nutritious and tasty addition to any diet.',
+            children: product.description
         }
     ];
     const addToCart = () => {
@@ -72,7 +72,7 @@ function ProductDetail(props) {
     };
     const load_product = async () => {
         try {
-            const rs = await product_by_code(id);
+            const rs = await product_detail(id);
             setProduct(rs.data.product);
         }
         catch (error) {

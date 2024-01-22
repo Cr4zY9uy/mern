@@ -1,7 +1,8 @@
 import "./../style/popover_input.css";
 import { Popover, OverlayTrigger } from "react-bootstrap";
 import { Form, Button, Space, Input } from "antd";
-function Popover_Input() {
+function Popover_Input(props) {
+    const data = props.info;
     const popover_right = (
         <Popover id="popover-input">
             <Popover.Header as="h3">First name:</Popover.Header>
@@ -24,7 +25,7 @@ function Popover_Input() {
     );
     return (
         <OverlayTrigger trigger="click" placement="right" overlay={popover_right} rootClose={true}>
-            <Button type="link">Mark</Button>
+            <Button type="link">{data}</Button>
         </OverlayTrigger>
     );
 }

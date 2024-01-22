@@ -10,8 +10,8 @@ export const paginate_product = async (page) => {
         return {};
     }
 }
-export const product_by_code = async (id) => {
-    const url = URL.PRODUCT.BYCODEANDNAME + '?id=' + id;
+export const product_detail = async (id) => {
+    const url = URL.PRODUCT.DETAIL + id;
     try {
         const rs = await api.get(url);
         return rs;
@@ -20,8 +20,18 @@ export const product_by_code = async (id) => {
         return {};
     }
 }
-export const product_by_name = async (name) => {
-    const url = URL.PRODUCT.BYCODEANDNAME + '?name=' + name;
+export const product_by_code = async (id, page) => {
+    const url = URL.PRODUCT.BYCODE + id + "?page=" + page;
+    try {
+        const rs = await api.get(url);
+        return rs;
+    }
+    catch (error) {
+        return {};
+    }
+}
+export const product_by_name = async (name, page) => {
+    const url = URL.PRODUCT.BYNAME + name + "?page=" + page;
     try {
         const rs = await api.get(url);
         return rs;
