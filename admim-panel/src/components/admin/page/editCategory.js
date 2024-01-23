@@ -32,7 +32,7 @@ function EditCategory() {
         try {
             const rs = await detail_category(id);
             setCategory(rs.data.category);
-            setData(rs.data.category, rs.data.description)
+            setData({ name: rs.data.category.name, category: rs.data.category.description })
             if (rs.status !== 200) {
                 console.log(rs.statusText)
             }
@@ -46,6 +46,7 @@ function EditCategory() {
     const onFinishFailed = (errorInfo) => {
         return errorInfo;
     };
+    console.log(data, category);
 
     useEffect(() => {
         category_detail();
@@ -64,7 +65,7 @@ function EditCategory() {
     });
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!onFinishFailed) {
+        if (onFinishFailed !== null) {
             try {
                 const res = await edit_category(id, { ...data, image });
                 if (res.status === 200) {
@@ -161,27 +162,34 @@ function EditCategory() {
                         validateDebounce={1500}
                         rules={[
                             {
-                                min: 5
+                                required: true
                             },
                             {
-                                max: 50
+                                min: 5,
+                                message: "Minimum 5 character"
+                            },
+                            {
+                                max: 50,
+                                message: "Maximum 50 character"
                             }
                         ]}
-                        help="Maximum 50 characters"
+
                     >
                         <Input onChange={handleInput} name="name" />
                     </Form.Item>
                     <Form.Item
                         label="Description"
-                        hasFeedback help="Maximum 300 characters"
+                        hasFeedback
                         name="description"
                         validateDebounce={1500}
                         rules={[
                             {
-                                min: 5
+                                min: 5,
+                                message: "Minimum 5 character"
                             },
                             {
-                                max: 300
+                                max: 300,
+                                message: "Maximum 300 character"
                             }
                         ]}
                     >

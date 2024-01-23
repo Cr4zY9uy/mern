@@ -31,7 +31,7 @@ function Header(props) {
     }, [])
     return (
         <header>
-            <div className="headers container">
+            <div className="headers container" style={{ paddingLeft: 0, paddingRight: 0 }}>
                 <div className="header-logo d-flex align-items-center">
                     <Link to={"/"} className="icon">
                         <img src="/data/logo/scart-mid.png" alt="logo" width={120} height={60} />
@@ -48,7 +48,7 @@ function Header(props) {
                         </div>
                     </Link>
 
-                    <Link to={"/shop"}>shop</Link>
+                    {/* <Link to={"/shop"}>shop</Link> */}
                     <Link to={"/blog"}>blogs</Link>
                 </div>
                 <div className="header-icon">

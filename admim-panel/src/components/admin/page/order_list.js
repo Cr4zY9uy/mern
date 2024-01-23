@@ -10,11 +10,13 @@ import { Store } from 'react-notifications-component';
 import { delete_order_all, list_order } from '../../../services/order_service';
 import Delete_Modal from '../layout/modal_del';
 import convertToDate from '../../../functions/convertDate';
+import { Pagination } from 'antd';
 function Order_List() {
     document.title = "Order list";
     const [type, setType] = useState("");
     const [delID, setDelID] = useState("");
     const [order, setOrder] = useState([]);
+    const [totalProducts, setTotalProducts] = useState(0);
     const [page, setPage] = useState(1);
     const navigate = useNavigate();
     const [delStatus, setDelStatus] = useState(false);
@@ -24,6 +26,7 @@ function Order_List() {
         try {
             const rs = await list_order(page);
             setOrder(rs.data.order_list);
+            setTotalProducts(rs.data.total_product);
             if (rs.status !== 200) {
                 console.log(rs.statusText)
             }
@@ -33,13 +36,14 @@ function Order_List() {
             }
         }
     }
+
     const delete_all = async () => {
         const res = await delete_order_all();
         if (res.status === 200) {
             Store.addNotification({
-                title: "Sucess!!",
+                title: "Warning!!",
                 message: "You delete all orders successfully!",
-                type: "success",
+                type: "warning",
                 insert: "top",
                 container: "top-right",
                 animationIn: ["animate__animated", "animate__fadeIn"],
@@ -69,8 +73,7 @@ function Order_List() {
     useEffect(() => {
         cate_list();
         setType("order");
-        console.log(order);
-    }, [delStatus])
+    }, [delStatus, page])
     const showModal = () => {
         setIsModalOpen(true);
     };
@@ -144,16 +147,23 @@ function Order_List() {
                             <td>{item.payment_method}</td>
                             <td>{convertToDate(item.createdAt)}</td>
                             <td>
-                                <Button variant='danger' style={{ marginRight: "10px" }} onClick={() => {
-                                    showModal();
-                                    setDelID(item.order_id)
-                                }}><i class="bi bi-trash-fill"></i></Button>
-                                <Button variant='warning' onClick={() => { navigate(`/order/edit/${item.order_id}`) }}><FormOutlined /></Button>
+                                <div className='d-flex'>
+                                    <Button variant='danger' style={{ marginRight: "10px" }} onClick={() => {
+                                        showModal();
+                                        setDelID(item.order_id)
+                                    }}><i class="bi bi-trash-fill"></i></Button>
+                                    <Button variant='warning' onClick={() => { navigate(`/order/edit/${item.order_id}`) }}><FormOutlined /></Button>
+                                </div>
                             </td>
                         </tr>))
                     }
                 </tbody>
             </Table>
+            <Pagination
+                total={totalProducts}
+                pageSize={9}
+                current={page}
+                onChange={(page) => setPage(page)} />
             <Delete_Modal status={isModalOpen} onOk={handleModalOk} onCancel={handleModalCancel} type_del={type} id_del={delID} onDel={onDelete} />
         </div>
     );

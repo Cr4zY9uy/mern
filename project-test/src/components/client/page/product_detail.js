@@ -11,15 +11,17 @@ import Banner_Big from "../layout/banner_big";
 import { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import CART_ACTION from "../../../redux/cart/cart_action";
-import { product_by_cate, product_by_code, product_detail } from "../../../services/product_service";
+import { product_by_cate, product_by_code, product_detail, product_hot } from "../../../services/product_service";
 import { Cloudinary } from '@cloudinary/url-gen';
 import { AdvancedImage } from '@cloudinary/react';
-
 import { Store } from "react-notifications-component";
 import PRODUCT_ACTION from "../../../redux/product/product_action";
+import LastView from "../layout/last_view";
+import Hot from "../layout/hot";
 function ProductDetail(props) {
     const { id } = useParams();
-    document.title = "Product";
+    const products = props.state[1].products;
+    const [hot, setHot] = useState([]);
     const [product, setProduct] = useState({});
     const [productRelated, setProductRelated] = useState([]);
     const [quantity, setQuantity] = useState(1);
@@ -66,16 +68,23 @@ function ProductDetail(props) {
             }
         });
     };
-    const addToProduct = () => {
-        const products = props.state[1].products;
-        products.push({ ...product });
-        props.addToCart(products);
-    };
+    const load_product_hot = async () => {
+        try {
+            const rs = await product_hot();
+            setHot(rs.data.product_list);
+        } catch (error) {
+            console.log(error.message);
+        }
+    }
     const load_product = async () => {
         try {
             const rs = await product_detail(id);
             setProduct(rs.data.product);
-
+            const existingItemIndex = products.findIndex(item => item.product_id === rs.data.product.product_id);
+            if (existingItemIndex === -1) {
+                products.push({ ...rs.data.product });
+                props.addToProduct(products);
+            }
         }
         catch (error) {
             console.log(error.message);
@@ -94,6 +103,12 @@ function ProductDetail(props) {
         load_product();
     }, [id])
     useEffect(() => {
+        document.title = product.title;
+    }, [product])
+    useEffect(() => {
+        load_product_hot();
+    }, [])
+    useEffect(() => {
         if (product.category_name) {
             load_product_cate();
         }
@@ -111,48 +126,68 @@ function ProductDetail(props) {
                     </Breadcrumb.Item>
                 </Breadcrumb>
                 <div className="detail d-flex">
-                    <div className="img-group last_view d-flex flex-column">
-                        <img src="/data/fruits/apple1.png" alt="apple1" />
-                        <img src="/data/fruits/apple1.png" alt="apple1" />
-                        <img src="/data/fruits/apple1.png" alt="apple1" />
-                    </div>
-                    <div className="img-product">
-                        <AdvancedImage cldImg={cld.image(product.thumbnail)} />
-                    </div>
-                    <div className="info">
-                        <div>
-                            <h1>{product.title}</h1>
-                            <h5>
-                                {product.price * (1 - parseFloat(product.price_promotion))}$
-                                {product.price_promotion === 0 ? "" : <span className="discount">{`${product.price}$`}</span>}
-                            </h5>
+                    <div className="view">
+                        <div className="img-group last_view d-flex flex-column">
+                            <h5>LAST VIEW PRODUCTS</h5>
                             <hr />
-                            <p>Stock status: <span className="">{product.qty === 0 ? `Out of stock` : `In stock`}</span></p>
-                            <p>Category: <span>{product.category_name}</span></p>
-                            <hr />
+                            {
+                                products.filter(item => item.product_id !== product.product_id).slice(-3).map((item, index) => {
+                                    return <LastView product={item} key={index} />
+                                })
+                            }
                         </div>
-                        <div>
-                            <div className='form-group d-flex align-items-center justify-content-start'>
-                                <input value={quantity} className="form-control quantity" style={{ textAlign: "center" }} readOnly />
-                                <div className="d-flex flex-column justify-content-between ms-2" style={{ height: "100%", width: "30%" }}>
-                                    <Button variant="light" onClick={plus}>
-                                        <PlusOutlined />
-                                    </Button>
-                                    <Button variant="light" onClick={minus}>
-                                        <MinusOutlined />
-                                    </Button >
+                        <div className="img-group last_view d-flex flex-column mt-5">
+                            <h5>RECOMMEND PRODUCTS</h5>
+                            <hr />
+                            {
+                                hot.filter(item => item.qty > 0).slice(0, 3).map((item, index) => {
+                                    return <Hot product={item} key={index} />
+                                })
+                            }
+                        </div>
+                    </div>
+                    <div className="d-flex flex-column align-items-center">
+                        <div className="d-flex">
+                            <div className="img-product">
+                                <AdvancedImage cldImg={cld.image(product.thumbnail)} />
+                            </div>
 
+                            <div className="info">
+                                <div>
+                                    <h1>{product.title}</h1>
+                                    <h5>
+                                        {product.price * (1 - parseFloat(product.price_promotion))}$
+                                        {product.price_promotion === 0 ? "" : <span className="discount">{`${product.price}$`}</span>}
+                                    </h5>
+                                    <hr />
+                                    <p>Stock status: <span className="">{product.qty === 0 ? `Out of stock` : `In stock`}</span></p>
+                                    <p>Category: <span>{product.category_name}</span></p>
+                                    <hr />
+                                </div>
+                                <div>
+                                    <div className='form-group d-flex align-items-center justify-content-start'>
+                                        <input value={quantity} className="form-control quantity" style={{ textAlign: "center" }} readOnly />
+                                        <div className="d-flex flex-column justify-content-between ms-2" style={{ height: "100%", width: "30%" }}>
+                                            <Button variant="light" onClick={plus}>
+                                                <PlusOutlined />
+                                            </Button>
+                                            <Button variant="light" onClick={minus}>
+                                                <MinusOutlined />
+                                            </Button >
+
+                                        </div>
+                                    </div>
+                                    <Button variant="warning" style={{ width: "37.5%", height: "10vh", marginTop: 15 }} disabled={product.qty === 0 ? true : false} onClick={addToCart}> Add to cart</Button>
                                 </div>
                             </div>
-                            <Button variant="warning" style={{ width: "37.5%", height: "10vh", marginTop: 15 }} disabled={product.qty === 0 ? true : false} onClick={addToCart}> Add to cart</Button>
                         </div>
+                        <Tabs defaultActiveKey="1" items={items} style={{width:"70%",marginLeft:60}}/>
                     </div>
                 </div>
-                <Tabs defaultActiveKey="1" items={items} />
                 <div className="product_relate-list ">
                     <h2>You may like</h2>
                     <div className="relate_list row">
-                        {productRelated.filter(item => item.product_id !== id).slice(0, 4).map((item, index) => {
+                        {productRelated.filter(item => item.product_id !== id).slice(0, 3).map((item, index) => {
                             return <Product_LSView product={item} key={index} />
                         })}
                     </div>

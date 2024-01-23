@@ -9,7 +9,6 @@ import {
     Select,
     Button,
     Space,
-    Flex,
     Divider
 } from 'antd';
 import { Table } from "react-bootstrap";
@@ -18,6 +17,9 @@ import { detail_order, edit_order } from "../../../services/order_service";
 import { useNavigate, useParams } from "react-router";
 import { Store } from "react-notifications-component";
 import convertToDate from "../../../functions/convertDate";
+import { Cloudinary } from "@cloudinary/url-gen";
+import { AdvancedImage } from '@cloudinary/react';
+import { fill } from '@cloudinary/url-gen/actions/resize';
 function EditOrder() {
     const [data, setData] = useState({});
     const { id } = useParams();
@@ -27,6 +29,11 @@ function EditOrder() {
     const [product, setProduct] = useState([]);
     const [form] = Form.useForm();
     const [selection, setSelection] = useState({});
+    const cld = new Cloudinary({
+        cloud: {
+            cloudName: 'dv7ni8uod'
+        }
+    });
     const load_order = async () => {
 
         try {
@@ -41,20 +48,12 @@ function EditOrder() {
                 payment_status: rs.data.order.payment_status
             })
             setData({
-                order_id: rs.data.order.order_id,
-                first_name: rs.data.order.first_name,
-                last_name: rs.data.order.last_name,
-                phone: rs.data.order.phone,
-                email: rs.data.order.email,
-                address: rs.data.order.address,
-                country: rs.data.order.country,
-                products: rs.data.order.products,
                 shipping_cost: rs.data.order.shipping_cost,
                 discount: rs.data.order.discount,
                 other_fee: rs.data.order.other_fee,
                 received: rs.data.order.received,
                 note: rs.data.order.note,
-                balanced: rs.data.order.balanced,
+                balance: rs.data.order.balance,
                 createdAt: rs.data.order.createdAt
             })
             if (rs.status !== 200) {
@@ -78,63 +77,47 @@ function EditOrder() {
         setSelection({ ...selection, [name]: value });
     }
     useEffect(() => {
-        console.log(selection, data);
+        console.log({ ...data, ...selection });
     }, [data, selection])
     const handleSubmit = async (e) => {
-        e.preventDefault();
-        if (!onFinishFailed) {
-            try {
-                const res = await edit_order(id, { ...data });
-                if (res.status === 200) {
-                    Store.addNotification({
-                        title: "Sucess!!",
-                        message: "You edit an order successfully!",
-                        type: "success",
-                        insert: "top",
-                        container: "top-center",
-                        animationIn: ["animate__animated", "animate__fadeIn"],
-                        animationOut: ["animate__animated", "animate__fadeOut"],
-                        dismiss: {
-                            duration: 2000,
-                            onScreen: true
-                        }
-                    });
-                    navigate("/category")
-                }
-                else {
-                    Store.addNotification({
-                        title: "Failure!!",
-                        message: "You edit an order unsuccessfully!",
-                        type: "danger",
-                        insert: "top",
-                        container: "top-center",
-                        animationIn: ["animate__animated", "animate__fadeIn"],
-                        animationOut: ["animate__animated", "animate__fadeOut"],
-                        dismiss: {
-                            duration: 2000,
-                            onScreen: true
-                        }
-                    });
-                }
-            } catch (error) {
-                console.log(error.message);
+
+        try {
+            const res = await edit_order(id, { ...data, ...selection });
+            if (res.status === 200) {
+                Store.addNotification({
+                    title: "Sucess!!",
+                    message: "You edit an order successfully!",
+                    type: "success",
+                    insert: "top",
+                    container: "top-center",
+                    animationIn: ["animate__animated", "animate__fadeIn"],
+                    animationOut: ["animate__animated", "animate__fadeOut"],
+                    dismiss: {
+                        duration: 2000,
+                        onScreen: true
+                    }
+                });
+                navigate("/order")
             }
+            else {
+                Store.addNotification({
+                    title: "Failure!!",
+                    message: "You edit an order unsuccessfully!",
+                    type: "danger",
+                    insert: "top",
+                    container: "top-center",
+                    animationIn: ["animate__animated", "animate__fadeIn"],
+                    animationOut: ["animate__animated", "animate__fadeOut"],
+                    dismiss: {
+                        duration: 2000,
+                        onScreen: true
+                    }
+                });
+            }
+        } catch (error) {
+            console.log(error.message);
         }
-        else {
-            Store.addNotification({
-                title: "Failure!!",
-                message: "You edit an order unsuccessfully!",
-                type: "danger",
-                insert: "top",
-                container: "top-center",
-                animationIn: ["animate__animated", "animate__fadeIn"],
-                animationOut: ["animate__animated", "animate__fadeOut"],
-                dismiss: {
-                    duration: 2000,
-                    onScreen: true
-                }
-            });
-        }
+
     };
     useEffect(() => {
         if (order) {
@@ -179,54 +162,132 @@ function EditOrder() {
                 title={title}
                 bordered={false}
             >
-                <Form {...formItemLayout} form={form} style={{ maxWidth: 600 }} onSubmitCapture={handleSubmit} onFinishFailed={onFinishFailed}>
+                <Form {...formItemLayout} form={form} style={{ maxWidth: 600 }} onFinish={handleSubmit} >
                     <Form.Item
                         label="First name"
                         hasFeedback
                         name="first_name"
-                        help="Maximum 200 characters"
+                        rules={[
+                            {
+                                required: true
+                            },
+                            {
+                                min: 5,
+                                message: "Minimum 5 character"
+                            },
+                            {
+                                max: 50,
+                                message: "Maximum 50 character"
+                            }
+                        ]}
+
                     >
-                        <Input name="first_name" onChange={handleInput} />
+                        <Input name="first_name" readOnly />
                     </Form.Item>
                     <Form.Item
                         label="Name"
                         hasFeedback
-                        help="Maximum 200 characters"
                         name="last_name"
+                        rules={[
+                            {
+                                required: true
+                            },
+                            {
+                                min: 5,
+                                message: "Minimum 5 character"
+                            },
+                            {
+                                max: 50,
+                                message: "Maximum 50 character"
+                            }
+                        ]}
+
                     >
-                        <Input name="last_name" onChange={handleInput} />
+                        <Input name="last_name" readOnly />
                     </Form.Item>
                     <Form.Item
                         label="Phone"
                         hasFeedback
-                        help="Maximum 200 characters"
                         name="phone"
+                        rules={[
+                            {
+                                required: true
+                            },
+                            {
+                                min: 5,
+                                message: "Minimum 5 character"
+                            },
+                            {
+                                max: 15,
+                                message: "Maximum 15 character"
+                            }
+                        ]}
+
                     >
-                        <Input name="phone" onChange={handleInput} />
+                        <Input name="phone" readOnly />
                     </Form.Item>
                     <Form.Item
                         label="Email"
                         hasFeedback
-                        help="Maximum 200 characters"
                         name="email"
+                        rules={[
+                            {
+                                required: true
+                            },
+                            {
+                                min: 15,
+                                message: "Minimum 5 character"
+                            },
+                            {
+                                max: 30,
+                                message: "Maximum 30 character"
+                            }
+                        ]}
+
                     >
-                        <Input name="email" onChange={handleInput} />
+                        <Input name="email" readOnly />
                     </Form.Item>
                     <Form.Item
                         label="Address"
                         hasFeedback
-                        help="Maximum 200 characters"
                         name="address"
+                        rules={[
+                            {
+                                required: true
+                            },
+                            {
+                                min: 5,
+                                message: "Minimum 5 character"
+                            },
+                            {
+                                max: 50,
+                                message: "Maximum 50 character"
+                            }
+                        ]}
+
                     >
-                        <Input name="address" onChange={handleInput} />
+                        <Input name="address" readOnly />
                     </Form.Item>
                     <Form.Item
                         label="Country"
                         hasFeedback
-                        help="Maximum 200 characters"
                         name="country"
+                        rules={[
+                            {
+                                required: true
+                            },
+                            {
+                                min: 5,
+                                message: "Minimum 5 character"
+                            },
+                            {
+                                max: 50,
+                                message: "Maximum 50 character"
+                            }
+                        ]}
+
                     >
-                        <Input name="country" onChange={handleInput} />
+                        <Input name="country" readOnly />
                     </Form.Item>
                     <Divider />
 
@@ -282,40 +343,86 @@ function EditOrder() {
                     <Form.Item
                         label="Discount"
                         hasFeedback
-                        help="Maximum 200 characters"
                         name="discount"
+                        rules={[
+                            {
+                                required: true
+                            },
+                            {
+                                min: 0,
+                                message: "Minimum 0"
+                            },
+                            ,
+                            {
+                                max: 1,
+                                message: "Maximum 1"
+                            }
+                        ]}
                     >
                         <Input name="discount" type="number" onChange={handleInput} />
                     </Form.Item>
                     <Form.Item
                         label="Shipping cost"
                         hasFeedback
-                        help="Maximum 200 characters"
                         name="shipping_cost"
+                        rules={[
+                            {
+                                required: true
+                            },
+                            {
+                                min: 0,
+                                message: "Minimum 0"
+                            }
+                        ]}
                     >
                         <Input name="shipping_cost" type="number" onChange={handleInput} />
                     </Form.Item>
                     <Form.Item
                         label="Other fee"
                         hasFeedback
-                        help="Maximum 200 characters"
                         name="other_fee"
+                        rules={[
+                            {
+                                required: true
+                            },
+                            {
+                                min: 0,
+                                message: "Minimum 5"
+                            }
+                        ]}
                     >
                         <Input name="other_fee" type="number" onChange={handleInput} />
                     </Form.Item>
                     <Form.Item
                         label="Received(-)"
                         hasFeedback
-                        help="Maximum 200 characters"
                         name="received"
+                        rules={[
+                            {
+                                required: true
+                            },
+                            {
+                                min: 0,
+                                message: "Minimum 0"
+                            }
+                        ]}
                     >
                         <Input name="received" type="number" onChange={handleInput} />
                     </Form.Item>
                     <Form.Item
                         label="Balance"
                         hasFeedback
-                        help="Maximum 200 characters"
                         name="balance"
+                        rules={[
+                            {
+                                required: true
+                            },
+                            {
+                                min: 0,
+                                message: "Minimum 0"
+                            }
+                        ]}
+
                     >
                         <Input name="balance" type="number" onChange={handleInput} />
                     </Form.Item>
@@ -335,19 +442,7 @@ function EditOrder() {
                     >
                         <Input.TextArea allowClear onChange={handleInput} name="note" />
                     </Form.Item>
-                    <Form.Item
-                        wrapperCol={{
-                            span: 24,
-                            offset: 16,
-                        }}
-                    >
-                        <Space>
-                            <Button type="primary" htmlType="submit">
-                                Submit
-                            </Button>
-                            <Button htmlType="reset">reset</Button>
-                        </Space>
-                    </Form.Item>
+
                     <Table bordered hover responsive="lg">
                         <thead>
                             <tr>
@@ -360,10 +455,35 @@ function EditOrder() {
                             </tr>
                         </thead>
                         <tbody>
-
+                            {
+                                product.map((item, index) => {
+                                    return <tr>
+                                        <th>{item.product_id}</th>
+                                        <th>
+                                            <AdvancedImage cldImg={cld.image(item.thumbnail).resize(fill().width(50).height(50))} />
+                                            {item.title}</th>
+                                        <th>{item.price * (1 - item.price_promotion)}$</th>
+                                        <th>{item.quantity}</th>
+                                        <th>{item.quantity * item.price * (1 - item.price_promotion)}$</th>
+                                        <th>{item.tax}</th>
+                                    </tr>
+                                })
+                            }
                         </tbody>
                     </Table>
-
+                    <Form.Item
+                        wrapperCol={{
+                            span: 24,
+                            offset: 16,
+                        }}
+                    >
+                        <Space>
+                            <Button type="primary" htmlType="submit">
+                                Submit
+                            </Button>
+                            <Button htmlType="reset">Reset</Button>
+                        </Space>
+                    </Form.Item>
                 </Form>
             </Card>
         </div >

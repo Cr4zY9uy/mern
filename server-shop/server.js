@@ -6,6 +6,7 @@ const dotenv = require("dotenv");
 const cors = require("cors")
 const cookieParser = require("cookie-parser");
 // const uri_db = 'mongodb+srv://heronakamura123:t0WLjSltwAP0khgB@scart.sggc0u9.mongodb.net/shop';
+const { check, validationResult } = require("express-validator");
 const uri_db = 'mongodb://127.0.0.1:27017/scart'
 const category_model = require("./models/category");
 const product_model = require("./models/product");
@@ -81,9 +82,41 @@ app.post("/category/add", checkAuth, async function (req, res) {
         return res.status(500).json({ message: error.message });
     }
 })
+app.get("/category_paginate", async function (req, res) {
+    const limit = 6;
+    const page = parseInt(req.query.page) ? parseInt(req.query.page) : 1;
+    const skip = (page - 1) * limit;
+    try {
+        const dataAll = await category_model.find().sort({ createdAt: -1 });
+        const data = dataAll.slice(skip, skip + limit);
+        if (data.length === 0) {
+            return res.status(400).json({ message: "No category" });
+        }
+        const total_page = Math.ceil(dataAll.length / limit);
+        if (data.length === 0) {
+            return res.status(400).json({ message: "No category" });
+        }
+        else {
+            const category_list = data.map((category) => ({
+                category_id: category.category_id,
+                name: category.name,
+                description: category.description,
+                image: category.image
+            })
+            );
+            return res.status(200).json({ category_list, total_page: total_page, total_product: dataAll.length, page: page });
+        }
+    } catch (error) {
+        return res.status(400).json({ message: error.message });
+    }
+})
 app.get("/category", async function (req, res) {
+
     try {
         const data = await category_model.find().sort({ createdAt: -1 });
+        if (data.length === 0) {
+            return res.status(400).json({ message: "No category" });
+        }
         if (data.length === 0) {
             return res.status(400).json({ message: "No category" });
         }
@@ -228,9 +261,20 @@ app.delete("/category/delete/:id", checkAuth, async function (req, res) {
         return res.status(400).json({ message: error.message });
     }
 })
-
-app.post("/register", async function (req, res) {
+const registerValidator = () => {
+    return [
+        check("email", "Vui long nhap email").not().isEmpty(),
+        check("email", "Email phai dung dinh dang").isEmail(),
+        check("password", "Password tu 6 ky tu").isLength({ min: 6 }),
+        check("name", "Name khong duoc de trong").not().isEmpty()
+    ];
+};
+app.post("/register", registerValidator, async function (req, res) {
     try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array().map(error => error.msg) });
+        }
         const data = req.body;
         const salt = await bcrypt.genSalt(12);
         const hashed = await bcrypt.hash(data.password, salt);
@@ -242,9 +286,19 @@ app.post("/register", async function (req, res) {
         return res.status(400).json({ message: error.message });
     }
 })
+const loginValidator = () => {
+    return [
+        check("username", "Vui long nhap email").not().isEmpty(),
+        check("password", "Password tu 6 ky tu").isLength({ min: 6 })
+    ]
+}
 
-app.post("/login", async function (req, res) {
+app.post("/login", loginValidator, async function (req, res) {
     try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array().map(error => error.msg) });
+        }
         const data = req.body;
         const user = await user_model.findOne({ username: data.username });
         if (!user) {
@@ -292,17 +346,17 @@ app.post('/refresh_token', async (req, res) => {
     console.log(req.headers.x_authorization, req.body);
     const accessToken = req.headers.x_authorization;
     if (!accessToken) {
-        return res.status(400).json({ message: "Not allowed2" });
+        return res.status(400).json({ message: "Access token not available" });
     }
     const refreshToken = req.body.refreshToken;
     if (!refreshToken) {
-        return res.status(400).json({ message: "Not allowed3" });
+        return res.status(400).json({ message: "refresh token not available" });
     }
     const accessTokenLife = process.env.ACCESS_TOKEN_LIFE;
     const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
     const decoded = await jwt.verify(accessToken, accessTokenSecret, { ignoreExpiration: true });
     if (!decoded) {
-        return res.status(400).json({ message: "Not allowed 1" });
+        return res.status(400).json({ message: "Not available" });
     }
     const username = decoded.username;
     const role = decoded.role;
@@ -364,7 +418,13 @@ app.get("/product_paginate", async (req, res) => {
         return res.status(400).json({ message: error.message });
     }
 })
+
+
 app.post("/product/add", checkAuth, async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array().map(error => error.msg) });
+    }
     const data = req.body;
     try {
         const checkExistId = await product_model.findOne({ product_id: data.product_id });
@@ -637,28 +697,11 @@ app.put("/order/edit/:id", async function (req, res) {
                     order_id: order_id
                 },
                 {
-                    first_name: data.first_name,
-                    last_name: data.last_name,
-                    phone: data.phone,
-                    email: data.email,
-                    address: data.address,
-                    country: data.country,
                     payment_method: data.payment_method,
                     shipping_method: data.shipping_method,
                     payment_status: data.payment_status,
                     shipping_status: data.shipping_status,
                     order_status: data.order_status,
-                    products: [
-                        {
-                            product_id: data.products.product_id,
-                            title: data.products.title,
-                            price: data.products.price,
-                            qty: data.products.qty,
-                            thumbnail: data.products.thumbnail,
-                            price_promotion: data.products.price_promotion,
-                            tax: data.products.tax
-                        }
-                    ],
                     shipping_cost: data.shipping_cost,
                     discount: data.discount,
                     other_fee: data.other_fee,

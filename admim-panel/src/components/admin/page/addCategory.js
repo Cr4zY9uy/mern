@@ -19,7 +19,7 @@ function AddCategory() {
     const navigate = useNavigate();
     const [data, setData] = useState({});
     const [image, setImage] = useState("");
-
+    const [form] = Form.useForm();
     const formItemLayout = {
         labelCol: {
             xs: { span: 30 },
@@ -31,73 +31,58 @@ function AddCategory() {
         },
     };
     const onFinishFailed = (errorInfo) => {
-        return errorInfo;
+        console.error(errorInfo);
     };
     const handleInput = (e) => {
         setData({ ...data, [e.target.name]: e.target.value });
     }
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        if (onFinishFailed !== null) {
-            try {
+    const handleSubmit = async () => {
+        try {
 
-                const res = await add_category({ ...data, image });
-                if (res.status === 201) {
+            const res = await add_category({ ...data, image });
+            if (res.status === 201) {
 
-                    Store.addNotification({
-                        title: "Sucess!!",
-                        message: "You add a category successfully!",
-                        type: "success",
-                        insert: "top",
-                        container: "top-center",
-                        animationIn: ["animate__animated", "animate__fadeIn"],
-                        animationOut: ["animate__animated", "animate__fadeOut"],
-                        dismiss: {
-                            duration: 2000,
-                            onScreen: true
-                        }
-                    });
-                    navigate("/category")
-                }
-                else {
-                    Store.addNotification({
-                        title: "Failure!!",
-                        message: "You add a category unsuccessfully!",
-                        type: "danger",
-                        insert: "top",
-                        container: "top-center",
-                        animationIn: ["animate__animated", "animate__fadeIn"],
-                        animationOut: ["animate__animated", "animate__fadeOut"],
-                        dismiss: {
-                            duration: 2000,
-                            onScreen: true
-                        }
-                    });
-                }
-
-
-            } catch (error) {
-                console.log(error.message);
+                Store.addNotification({
+                    title: "Sucess!!",
+                    message: "You add a category successfully!",
+                    type: "success",
+                    insert: "top",
+                    container: "top-center",
+                    animationIn: ["animate__animated", "animate__fadeIn"],
+                    animationOut: ["animate__animated", "animate__fadeOut"],
+                    dismiss: {
+                        duration: 2000,
+                        onScreen: true
+                    }
+                });
+                navigate("/category")
             }
-        } else {
-            console.log(1001);
-            Store.addNotification({
-                title: "Failure!!",
-                message: "You add a category unsuccessfully!",
-                type: "danger",
-                insert: "top",
-                container: "top-center",
-                animationIn: ["animate__animated", "animate__fadeIn"],
-                animationOut: ["animate__animated", "animate__fadeOut"],
-                dismiss: {
-                    duration: 2000,
-                    onScreen: true
-                }
-            });
+            else {
+                Store.addNotification({
+                    title: "Failure!!",
+                    message: "You add a category unsuccessfully!",
+                    type: "danger",
+                    insert: "top",
+                    container: "top-center",
+                    animationIn: ["animate__animated", "animate__fadeIn"],
+                    animationOut: ["animate__animated", "animate__fadeOut"],
+                    dismiss: {
+                        duration: 2000,
+                        onScreen: true
+                    }
+                });
+            }
+
+
+        } catch (error) {
+            console.log(error.message);
         }
+
     };
+    const error = onFinishFailed();
     useEffect(() => {
         console.log({ ...data, image });
+        onFinishFailed();
     }, [data])
     const normFile = (e) => {
         if (Array.isArray(e)) {
@@ -122,7 +107,8 @@ function AddCategory() {
                 title="Create a new category"
                 bordered={false}
             >
-                <Form {...formItemLayout} style={{ maxWidth: 600 }} onSubmitCapture={handleSubmit}
+                <Form {...formItemLayout} style={{ maxWidth: 600 }} onFinish={handleSubmit}
+                    form={form}
                     onFinishFailed={onFinishFailed}
                 >
                     <Form.Item
@@ -132,13 +118,17 @@ function AddCategory() {
                         name="Category ID"
                         rules={[
                             {
-                                min: 5
+                                required: true
                             },
                             {
-                                max: 10
+                                min: 5,
+                                message: "Minimum 5 character"
+                            },
+                            {
+                                max: 50,
+                                message: "Maximum 50 character"
                             }
                         ]}
-                        help="Maximum 10 characters"
                     >
                         <Input name="category_id" onChange={handleInput} />
                     </Form.Item>
@@ -149,13 +139,17 @@ function AddCategory() {
                         validateDebounce={1500}
                         rules={[
                             {
-                                min: 5
+                                required: true
                             },
                             {
-                                max: 50
+                                min: 5,
+                                message: "Minimum 5 character"
+                            },
+                            {
+                                max: 50,
+                                message: "Maximum 50 character"
                             }
                         ]}
-                        help="Maximum 50 characters"
                     >
                         <Input name="name" onChange={handleInput} />
                     </Form.Item>
@@ -164,13 +158,15 @@ function AddCategory() {
                         validateDebounce={1500}
                         rules={[
                             {
-                                min: 5
+                                min: 5,
+                                message: "Minimum 5 character"
                             },
                             {
-                                max: 300
+                                max: 300,
+                                message: "Maximum 300 character"
                             }
                         ]}
-                        hasFeedback help="Maximum 300 characters">
+                        hasFeedback >
                         <Input.TextArea allowClear name="description" onChange={handleInput} />
                     </Form.Item>
                     <Form.Item

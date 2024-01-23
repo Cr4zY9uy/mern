@@ -58,6 +58,10 @@
     color: rgb(255, 255, 255);
 }
 
-.btn-warning {
-    margin: 0 10px;
+
+.order_list .ant-pagination {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+    margin-top: 40px;
 }

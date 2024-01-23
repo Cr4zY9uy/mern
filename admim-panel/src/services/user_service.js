@@ -25,7 +25,7 @@ export const refreshToken = async () => {
     }
 }
 function scheduleTokenRefresh() {
-    const refreshInterval = 10 * 60 * 1000;
+    const refreshInterval = 5 * 60 * 1000;
     refreshToken();
     setInterval(refreshToken, refreshInterval);
 }

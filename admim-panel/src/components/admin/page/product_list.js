@@ -41,9 +41,9 @@ function Product_List() {
         const res = await delete_product_all();
         if (res.status === 200) {
             Store.addNotification({
-                title: "Sucess!!",
+                title: "Warning!!",
                 message: "You delete all products successfully!",
-                type: "success",
+                type: "warning",
                 insert: "top",
                 container: "top-right",
                 animationIn: ["animate__animated", "animate__fadeIn"],
@@ -115,7 +115,6 @@ function Product_List() {
                                 </div>
                                 <div className="del">
                                     <Button variant='danger'
-                                        disabled={handleCheckboxChange()}
                                         onClick={delete_all}><i class="bi bi-trash-fill"></i></Button>
                                 </div>
                             </div>
@@ -156,11 +155,13 @@ function Product_List() {
                                 <td>{item.price_promotion}</td>
                                 <td>{item.status === 1 ? <div className='product_hot'>HOT</div> : ""}</td>
                                 <td>
-                                    <Button variant='danger' style={{ marginRight: "10px" }} onClick={() => {
-                                        showModal();
-                                        setDelID(item.product_id)
-                                    }}><i class="bi bi-trash-fill"></i></Button>
-                                    <Button variant='warning' onClick={() => { navigate(`/product/edit/${item.product_id}`) }}><FormOutlined /></Button>
+                                    <div className='d-flex'>
+                                        <Button variant='danger' style={{ marginRight: "10px" }} onClick={() => {
+                                            showModal();
+                                            setDelID(item.product_id)
+                                        }}><i class="bi bi-trash-fill"></i></Button>
+                                        <Button variant='warning' onClick={() => { navigate(`/product/edit/${item.product_id}`) }}><FormOutlined /></Button>
+                                    </div>
                                 </td>
                             </tr>
                         )

@@ -54,9 +54,6 @@
     color: rgb(255, 255, 255);
 }
 
-.category_list .btn-warning {
-    margin: 0 0px 0 10px;
-}
 
 .category_list table {
     table-layout: auto;
@@ -74,8 +71,11 @@
     min-width: 80px;
 }
 
-.category_list table th:nth-child(6),
-.category_list table td:nth-child(6) {
-    max-width: 690px;
-    min-width: 180px;
+
+
+.category_list .ant-pagination {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+    margin-top: 40px;
 }

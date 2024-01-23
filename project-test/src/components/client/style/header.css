@@ -44,7 +44,7 @@ header {
 
 .header-link {
     display: flex;
-    justify-content: space-around;
+    justify-content: center;
     align-items: center;
     width: 70%;
     text-align: center;
@@ -84,7 +84,7 @@ header {
     position: absolute;
     text-align: center;
     line-height: 19px;
-    right: 55px;
+    right: 45px;
     top: 10px;
 }
 
@@ -130,4 +130,7 @@ header {
 .headers .main_menu:hover .sub_menu {
     display: flex;
     flex-direction: column;
+}
+.header-link a{
+    padding: 0 10px;
 }

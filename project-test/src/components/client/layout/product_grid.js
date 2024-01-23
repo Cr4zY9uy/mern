@@ -15,11 +15,9 @@ function Product_Grid(props) {
         <div className="search_item col-4">
             <Link to={`/product/${product.product_id}`}><AdvancedImage cldImg={cld.image(product.thumbnail)} /></Link>
             <h4>{product.title}</h4>
-            <p>  {product.price * (1 - parseFloat(product.price_promotion))}$
+            <p>  {Math.ceil(product.price * (1 - parseFloat(product.price_promotion)))}$
                 {product.price_promotion === 0 ? "" : <span className="discount">{`${product.price}$`}</span>}</p>
         </div>
-
-
     );
 }
 export default Product_Grid;

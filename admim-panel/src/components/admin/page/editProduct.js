@@ -61,7 +61,7 @@ function EditProduct() {
     const product_detail_code = async () => {
         try {
             const rs = await detail_product_code(id);
-            setProduct(rs.data.product);
+            setProduct(rs.data.product[0]);
             if (rs.status !== 200) {
                 console.log(rs.statusText)
             }
@@ -79,6 +79,7 @@ function EditProduct() {
     });
     useEffect(() => {
         product_detail_code();
+        console.log(product);
     }, [])
     useEffect(() => {
         cate_list();
@@ -87,8 +88,7 @@ function EditProduct() {
     const handleInput = (e) => {
         setData({ ...data, [e.target.name]: e.target.value });
     }
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    const handleSubmit = async () => {
         try {
             const res = await edit_product({ ...data, image, category_name });
             if (res.status === 201) {
@@ -160,20 +160,35 @@ function EditProduct() {
                 title=""
                 bordered={false}
             >
-                <Form {...formItemLayout} style={{ maxWidth: 600 }} form={form} onSubmitCapture={handleSubmit}>
+                <Form {...formItemLayout} style={{ maxWidth: 600 }} form={form} onFinish={handleSubmit}>
                     <Form.Item
                         label="Name"
                         hasFeedback
-                        validateStatus=""
-                        help="Maximum 200 characters"
                         name="title"
+                        rules={[
+                            {
+                                required: true
+                            },
+                            {
+                                min: 5,
+                                message: "Minimum 5 character"
+                            },
+                            {
+                                max: 50,
+                                message: "Maximum 50 character"
+                            }
+                        ]}
                     >
                         <Input onChange={handleInput} name="title" />
                     </Form.Item>
                     <Form.Item label="Category"
                         hasFeedback
-                        validateStatus=""
-                        name="category_name">
+                        name="category_name"
+                        rules={[
+                            {
+                                required: true,
+                                message: "Choose 1 opition"
+                            }]}>
                         <Select allowClear name="category_name" onChange={value => setCategoryName(value)} >
                             {category.map((item) => (
                                 <Option value={item.name} style={{ height: 50 }}>{item.name}</Option>
@@ -183,16 +198,40 @@ function EditProduct() {
                     <Form.Item
                         label="Price"
                         hasFeedback
-                        help="Maximum 200 characters"
                         name="price"
+                        rules={[
+                            {
+                                required: true
+                            },
+                            {
+                                min: 0,
+                                message: "Minimum 0 "
+                            },
+                            {
+                                max: 999,
+                                message: "Maximum 999 "
+                            }
+                        ]}
                     >
                         <Input name="price" type="number" onChange={handleInput} />
                     </Form.Item>
 
                     <Form.Item label="Quantity"
                         hasFeedback
-                        validateStatus=""
-                        name="qty">
+                        name="qty"
+                        rules={[
+                            {
+                                required: true
+                            },
+                            {
+                                min: 0,
+                                message: "Minimum 0 "
+                            },
+                            {
+                                max: 99,
+                                message: "Maximum 99 "
+                            }
+                        ]}>
                         <Input type="number" name="qty" onChange={handleInput} />
                     </Form.Item>
                     <Form.Item
@@ -208,14 +247,36 @@ function EditProduct() {
 
                     <Form.Item label="Price promotion"
                         hasFeedback
-                        validateStatus=""
-                        name="price_promotion">
+                        name="price_promotion"
+                        rules={[
+                            {
+                                required: true
+                            },
+                            {
+                                min: 0,
+                                message: "Minimum 0 "
+                            },
+                            {
+                                max: 1,
+                                message: "Maximum 1"
+                            }
+                        ]}>
                         <Input type="number" name="price_promotion" onChange={handleInput} />
                     </Form.Item>
                     <Form.Item label="Description"
-                        validateStatus=""
-                        hasFeedback help="Maximum 300 characters"
-                        name="description">
+                        hasFeedback
+                        name="description"
+                        rules={[
+
+                            {
+                                min: 5,
+                                message: "Minimum 5 characters "
+                            },
+                            {
+                                max: 300,
+                                message: "Maximum 300 characters"
+                            }
+                        ]}>
                         <Input.TextArea allowClear name="description" onChange={handleInput} />
                     </Form.Item>
                     <Form.Item label="Initial image" className="imageInitial">
@@ -228,6 +289,12 @@ function EditProduct() {
                         valuePropName="fileList"
                         getValueFromEvent={normFile}
                         extra="Choose an image"
+                        rules={[
+                            {
+                                required: true,
+                                message: "Input that field"
+                            }
+                        ]}
                     >
                         <Upload name="image" action="/upload.do" listType="picture" className="d-flex align-items-center" beforeUpload={file => handleImage(file)}>
                             <Button icon={<UploadOutlined />}>Click to upload</Button>

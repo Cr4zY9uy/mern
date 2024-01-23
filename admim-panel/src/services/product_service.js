@@ -11,7 +11,7 @@ export const paginate_product = async (page) => {
     }
 }
 export const detail_product_code = async (id) => {
-    const url = URL.PRODUCT.DETAIL + "?id=" + id;
+    const url = URL.PRODUCT.DETAIL + id;
     try {
         const rs = await api.get(url);
         return rs;

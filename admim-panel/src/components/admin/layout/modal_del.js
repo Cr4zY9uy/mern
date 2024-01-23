@@ -23,9 +23,9 @@ function Delete_Modal(props) {
             }
             if (res.status === 200) {
                 Store.addNotification({
-                    title: "Sucess!!",
+                    title: "Warning!!",
                     message: `You delete a ${type} successfully!`,
-                    type: "success",
+                    type: "warning",
                     insert: "top",
                     container: "top-center",
                     animationIn: ["animate__animated", "animate__fadeIn"],
@@ -35,7 +35,7 @@ function Delete_Modal(props) {
                         onScreen: true
                     }
                 });
-           
+
                 props.onDel();
             }
             else {

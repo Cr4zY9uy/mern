@@ -56,7 +56,7 @@ function Home() {
             <div className="product_list container">
                 <h1>new products</h1>
                 <div className="products">
-                    {product_new.slice(1, 5).map((item, index) => {
+                    {product_new.filter(product => product.qty > 0).slice(1, 5).map((item, index) => {
                         return <Product_List products={item} key={index} />
                     })}
                 </div>

@@ -1,9 +1,10 @@
 .searchResult {
     padding-bottom: 50px;
+    text-align: center;
 }
 
 .searchResult .search_item img {
-    width: 100%;
+    width: 70%;
 }
 
 .searchResult .search_item p {
@@ -23,18 +24,19 @@
 
 .searchResult span {
     color: rgba(128, 128, 128, 0.607);
-    font-size: 18px;
+    font-size: 16px;
     margin-left: 10px;
 }
 
 .searchResult p {
     color: rgb(241, 28, 28);
-    font-size: 20px;
+    font-size: 17px;
 }
 
 .searchResult h4 {
     margin-bottom: 20px;
     font-weight: 400;
+    font-size: 18px;
 }
 
 .searchResult .discount {

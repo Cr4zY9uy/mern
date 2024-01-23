@@ -22,6 +22,7 @@
 
 .product {
     width: 200px;
+    margin-top: 20px;
     height: 15vh;
     display: flex;
     flex-direction: column;
@@ -38,7 +39,7 @@
 
 .product span,
 .product p {
-    font-weight: 600;
+    font-weight: 500;
 }
 
 .product span {
@@ -59,7 +60,40 @@
 .product button:hover {
     color: rgb(255, 255, 255);
 }
-.product .status{
+
+.product .status {
     width: 100%;
-    
+
+}
+
+.product_list button {
+    position: relative;
+    display: inline-block;
+    margin: 15px;
+    padding: 10px 20px;
+    text-align: center;
+    font-size: 14px;
+    letter-spacing: 1px;
+    text-decoration: none;
+    background: transparent;
+    cursor: pointer;
+    transition: ease-out 0.4s;
+    border-radius: 10px;
+    box-shadow: inset 0 0 0 0 #ffc107;
+}
+
+
+.product_list button:hover {
+    color: white;
+    box-shadow: inset 0 -100px 0 0 #ffc107;
+}
+
+
+.product_list button:active {
+    transform: scale(0.9);
+}
+
+.product a img {
+    width: 100%;
+    height: 100%;
 }

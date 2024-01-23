@@ -47,7 +47,7 @@ function Product_List(props) {
         <img src="/data/badge/sold_out.png" alt="sold_out" width={50} height={25} style={{ display: product.qty === 0 ? "block" : "none" }} />
       </div>
       <Link to={`/product/${product.product_id}`}>
-        <AdvancedImage cldImg={cld.image(product.thumbnail).resize(fill().width(300).height(300))} />
+        <AdvancedImage cldImg={cld.image(product.thumbnail)} />
       </Link>
       <h4>{product.title}</h4>
       <p>

@@ -42,7 +42,7 @@ function Product_LSView(props) {
     return (
         <div className='item col-4'>
             <Link to={`/product/${product.product_id}`}><AdvancedImage cldImg={cld.image(product.thumbnail)} /></Link>
-            <h4>{product.title.substring(0, 23) + '...'}</h4>
+            <h4>{product.title.length > 18 ? product.title.substring(0, 18) + '...' : product.title}</h4>
             <p>
                 {product.price * (1 - parseFloat(product.price_promotion))}$
                 {product.price_promotion === 0 ? "" : <span className="discount">{`${product.price}$`}</span>}

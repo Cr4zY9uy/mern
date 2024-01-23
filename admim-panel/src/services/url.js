@@ -1,7 +1,7 @@
 const URL = {
     PRODUCT: {
         PAGINATE: 'product_paginate',
-        DETAIL: 'product',
+        DETAIL: 'product_by_id/',
         ADD: 'product/add',
         DELETE: 'product/delete/',
         EDIT: 'product/edit/',
