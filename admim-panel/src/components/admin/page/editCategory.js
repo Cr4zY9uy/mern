@@ -63,61 +63,46 @@ function EditCategory() {
             cloudName: 'dv7ni8uod'
         }
     });
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        if (onFinishFailed !== null) {
-            try {
-                const res = await edit_category(id, { ...data, image });
-                if (res.status === 200) {
-                    Store.addNotification({
-                        title: "Sucess!!",
-                        message: "You edit a category successfully!",
-                        type: "success",
-                        insert: "top",
-                        container: "top-center",
-                        animationIn: ["animate__animated", "animate__fadeIn"],
-                        animationOut: ["animate__animated", "animate__fadeOut"],
-                        dismiss: {
-                            duration: 2000,
-                            onScreen: true
-                        }
-                    });
-                    navigate("/category")
-                }
-                else {
-                    Store.addNotification({
-                        title: "Failure!!",
-                        message: "You edit a category unsuccessfully!",
-                        type: "danger",
-                        insert: "top",
-                        container: "top-center",
-                        animationIn: ["animate__animated", "animate__fadeIn"],
-                        animationOut: ["animate__animated", "animate__fadeOut"],
-                        dismiss: {
-                            duration: 2000,
-                            onScreen: true
-                        }
-                    });
-                }
-            } catch (error) {
-                console.log(error.message);
+    const handleSubmit = async () => {
+
+        try {
+            const res = await edit_category(id, { ...data, image });
+            if (res.status === 200) {
+                Store.addNotification({
+                    title: "Sucess!!",
+                    message: "You edit a category successfully!",
+                    type: "success",
+                    insert: "top",
+                    container: "top-center",
+                    animationIn: ["animate__animated", "animate__fadeIn"],
+                    animationOut: ["animate__animated", "animate__fadeOut"],
+                    dismiss: {
+                        duration: 2000,
+                        onScreen: true
+                    }
+                });
+                navigate("/category")
             }
+            else {
+                Store.addNotification({
+                    title: "Failure!!",
+                    message: "You edit a category unsuccessfully!",
+                    type: "danger",
+                    insert: "top",
+                    container: "top-center",
+                    animationIn: ["animate__animated", "animate__fadeIn"],
+                    animationOut: ["animate__animated", "animate__fadeOut"],
+                    dismiss: {
+                        duration: 2000,
+                        onScreen: true
+                    }
+                });
+            }
+        } catch (error) {
+            console.log(error.message);
         }
-        else {
-            Store.addNotification({
-                title: "Failure!!",
-                message: "You edit a category unsuccessfully!",
-                type: "danger",
-                insert: "top",
-                container: "top-center",
-                animationIn: ["animate__animated", "animate__fadeIn"],
-                animationOut: ["animate__animated", "animate__fadeOut"],
-                dismiss: {
-                    duration: 2000,
-                    onScreen: true
-                }
-            });
-        }
+
+
     };
 
     const handleImage = (file) => {
@@ -151,7 +136,7 @@ function EditCategory() {
             <Card
                 title="Edit a  category"
                 bordered={false}>
-                <Form {...formItemLayout} style={{ maxWidth: 600 }} onSubmitCapture={handleSubmit}
+                <Form {...formItemLayout} style={{ maxWidth: 600 }} onFinish={handleSubmit}
                     form={form}
                     onFinishFailed={onFinishFailed}
                 >

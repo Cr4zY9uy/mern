@@ -30,18 +30,14 @@ function AddCategory() {
             sm: { span: 14 },
         },
     };
-    const onFinishFailed = (errorInfo) => {
-        console.error(errorInfo);
-    };
+
     const handleInput = (e) => {
         setData({ ...data, [e.target.name]: e.target.value });
     }
     const handleSubmit = async () => {
         try {
-
             const res = await add_category({ ...data, image });
             if (res.status === 201) {
-
                 Store.addNotification({
                     title: "Sucess!!",
                     message: "You add a category successfully!",
@@ -79,11 +75,7 @@ function AddCategory() {
         }
 
     };
-    const error = onFinishFailed();
-    useEffect(() => {
-        console.log({ ...data, image });
-        onFinishFailed();
-    }, [data])
+
     const normFile = (e) => {
         if (Array.isArray(e)) {
             return e;
@@ -109,20 +101,19 @@ function AddCategory() {
             >
                 <Form {...formItemLayout} style={{ maxWidth: 600 }} onFinish={handleSubmit}
                     form={form}
-                    onFinishFailed={onFinishFailed}
                 >
                     <Form.Item
                         label="Category ID"
                         hasFeedback
                         validateDebounce={1500}
-                        name="Category ID"
+                        name="category_id"
                         rules={[
                             {
                                 required: true
                             },
                             {
-                                min: 5,
-                                message: "Minimum 5 character"
+                                min: 4,
+                                message: "Minimum 4 character"
                             },
                             {
                                 max: 50,
@@ -134,7 +125,7 @@ function AddCategory() {
                     </Form.Item>
                     <Form.Item
                         label="Name"
-                        name="Category Name"
+                        name="name"
                         hasFeedback
                         validateDebounce={1500}
                         rules={[
@@ -154,7 +145,7 @@ function AddCategory() {
                         <Input name="name" onChange={handleInput} />
                     </Form.Item>
                     <Form.Item label="Description"
-                        name="Description"
+                        name="description"
                         validateDebounce={1500}
                         rules={[
                             {
@@ -171,11 +162,17 @@ function AddCategory() {
                     </Form.Item>
                     <Form.Item
                         hasFeedback
-                        name="upload"
+                        name="image"
                         label="Upload"
                         valuePropName="fileList"
                         getValueFromEvent={normFile}
                         extra="Choose an image"
+                        rules={[
+                            {
+                                required: true,
+                                message: "Input that field"
+                            }
+                        ]}
                     >
                         <Upload name="image" listType="picture" className="d-flex align-items-center" beforeUpload={file => handleImage(file)}
                         >

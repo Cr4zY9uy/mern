@@ -352,7 +352,7 @@ function EditOrder() {
                                 min: 0,
                                 message: "Minimum 0"
                             },
-                            ,
+
                             {
                                 max: 1,
                                 message: "Maximum 1"

@@ -12,7 +12,7 @@ import { delete_category_all, list_category, list_category_paginate } from '../.
 import { useEffect, useState } from 'react';
 import { Store } from 'react-notifications-component';
 import Delete_Modal from '../layout/modal_del';
-import { Modal, Pagination } from 'antd';
+import { Pagination } from 'antd';
 function Category_List() {
     document.title = "Category list";
 
