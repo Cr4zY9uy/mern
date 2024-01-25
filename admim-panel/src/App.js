@@ -20,12 +20,10 @@ import { ReactNotifications } from 'react-notifications-component'
 function App(props) {
   const location = useLocation();
   const hide = location.pathname === '/';
-  const currentUser = props.state.currentUser.name;
   const [navbarCollapsed, setNavbarCollapsed] = useState(false);
   const handleNavbarCollapse = (collapsed) => {
     setNavbarCollapsed(collapsed);
   };
-
   return (
     <>
       <div className='d-flex'>

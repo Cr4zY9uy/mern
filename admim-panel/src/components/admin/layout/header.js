@@ -8,6 +8,7 @@ import {
 import { connect } from "react-redux";
 import USER_ACTION from "../../../redux/user/user_action";
 import { useNavigate } from "react-router";
+import { logout } from "../../../services/user_service";
 function Header(props) {
     const [collapsed, setCollapsed] = useState(false);
     const user = props.state.currentUser.name;
@@ -18,9 +19,19 @@ function Header(props) {
         props.onToggleCollapsed(newCollapsed);
     };
 
-    const LogOut = () => {
-        props.logOut();
-        navigate('/');
+    const LogOut = async () => {
+        try {
+            const rs = await logout();
+            if (rs.status !== 200) {
+                alert("Logout fail! Retry")
+            }
+            else {
+                props.logOut();
+                navigate("/");
+            }
+        } catch (error) {
+            alert(error.message);
+        }
     }
     return (
         <div className="header">

@@ -20,7 +20,8 @@ const URL = {
     USER: {
         LOGIN: 'login',
         REGISTER: 'register',
-        REFRESH_TOKEN: 'refresh_token'
+        REFRESH_TOKEN: 'refresh_token',
+        LOGOUT: 'logout'
     },
     ORDER: {
         PAGINATE: 'order_paginate',

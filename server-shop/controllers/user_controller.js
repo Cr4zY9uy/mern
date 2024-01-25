@@ -1,10 +1,13 @@
 import bcrypt from "bcryptjs"
-import user_model from "../models/user.js";
+import user_model from "../models/user_model.js";
 import jwt from "jsonwebtoken"
 import randToken from "rand-token"
-export const login = async (req, res) => {
-    try {
+import { validationResult } from "express-validator";
 
+
+export const login = async (req, res) => {
+   
+    try {
         const data = req.body;
         const user = await user_model.findOne({ username: data.username });
         if (!user) {
@@ -33,37 +36,50 @@ export const login = async (req, res) => {
         else {
             refreshToken = user.refreshToken;
         }
-
+        res.cookie("refresh_token", refreshToken, { httpOnly: true, secure: true, sameSite: "none", maxAge: 60 * 60 * 1000 * 24 });
+        res.cookie("access_token", accessToken, { httpOnly: true, secure: true, sameSite: "none", maxAge: 60 * 60 * 1000 * 24 });
         return res.status(200).json({
             user: {
                 username: user.username,
-                name: user.name,
-            },
-            jwt: {
-                access_token: accessToken,
-                refresh_token: refreshToken
+                name: user.name
             }
         })
     } catch (error) {
-        return res.status(400).json({ message: error.message });
+        return res.status(500).json({ message: error.message });
     }
 }
 export const register = async (req, res) => {
+    
     try {
         const data = req.body;
+        const checkUsername = await user_model.findOne({ username: data.username });
+        if (checkUsername) {
+            return res.status(400).json({ message: "Username existed" });
+        }
+        const checkname = await user_model.findOne({ name: data.name });
+        if (checkname) {
+            return res.status(400).json({ message: "Name existed" });
+        }
         const salt = await bcrypt.genSalt(12);
         const hashed = await bcrypt.hash(data.password, salt)
-        console.log(hashed)
         data.password = hashed;
         const user = await user_model.create(data);
         if (user) {
             return res.status(201).json({ message: "Register successfully" });
         }
         else {
-            return res.status(400).json({ error: error.message });
+            return res.status(400).json({ message: error.message });
         }
-        // await user.save();
     } catch (error) {
-        return res.status(400).json({ message: error.message });
+        return res.status(500).json({ message: error.message });
+    }
+}
+export const logout = async (req, res) => {
+    try {
+        res.clearCookie("refresh_token")
+        res.clearCookie("access_token")
+        return res.status(200).json({ message: "Logout successfully" });
+    } catch (error) {
+        return res.status(500).json({ message: error.message })
     }
 }

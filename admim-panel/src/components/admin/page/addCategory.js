@@ -109,7 +109,9 @@ function AddCategory() {
                         name="category_id"
                         rules={[
                             {
-                                required: true
+                                required: true,
+                                message: "category_id must be not empty"
+
                             },
                             {
                                 min: 4,
@@ -130,7 +132,9 @@ function AddCategory() {
                         validateDebounce={1500}
                         rules={[
                             {
-                                required: true
+                                required: true,
+                                message: "name must be not empty"
+
                             },
                             {
                                 min: 5,
@@ -148,6 +152,10 @@ function AddCategory() {
                         name="description"
                         validateDebounce={1500}
                         rules={[
+                            {
+                                required: true,
+                                message: "description must be not empty"
+                            },
                             {
                                 min: 5,
                                 message: "Minimum 5 character"

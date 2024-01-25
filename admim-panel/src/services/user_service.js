@@ -11,6 +11,16 @@ export const login = async (user) => {
         return {};
     }
 }
+export const logout = async () => {
+    const url = URL.USER.LOGOUT;
+    try {
+        const rs = await api.post(url)
+        return rs;
+    }
+    catch (error) {
+        return {};
+    }
+}
 export const refreshToken = async () => {
     const url = URL.USER.REFRESH_TOKEN;
     try {
@@ -29,5 +39,6 @@ function scheduleTokenRefresh() {
     refreshToken();
     setInterval(refreshToken, refreshInterval);
 }
-
-scheduleTokenRefresh();
+if (JSON.parse(localStorage?.getItem("user"))?.jwt?.access_token) {
+    scheduleTokenRefresh();
+}
