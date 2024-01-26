@@ -8,7 +8,7 @@ export const add_product = async (req, res) => {
         if (checkExistId != null) {
             return res.status(400).json({ messsage: "Product id is existed" });
         }
-        const checkExistName = await product_model.findOne({ name: data.name });
+        const checkExistName = await product_model.findOne({ title: data.title });
         if (checkExistName != null) {
             return res.status(400).json({ messsage: "Product name is existed" });
         }
@@ -50,7 +50,16 @@ export const edit_product = async (req, res) => {
         }
         const update_product = await product_model.findOneAndUpdate(
             { product_id },
-            { name: data.name, description: data.description, image: data.thumbnail },
+            {
+                title: data.title,
+                price: data.price,
+                description: data.description,
+                qty: data.qty,
+                category_name: data.category_name,
+                thumbnail: data.thumbnail,
+                price_promotion: data.price_promotion,
+                status: data.status
+            },
             { new: true }
         );
         return res.status(200).json({ updated_product: update_product });
@@ -64,7 +73,7 @@ export const detail_product = async (req, res) => {
     try {
         const data = await product_model.findOne({ product_id: product_id })
         if (data === null) {
-            return res.status(400).json({ message: "Product no exists" });
+            return res.status(404).json({ message: "Product no exists" });
         }
         else {
             const product = {
@@ -166,15 +175,20 @@ export const all_product = async (req, res) => {
         else {
             const product_list = data.map((product) => ({
                 product_id: product.product_id,
-                name: product.name,
+                title: product.title,
+                price: product.price,
                 description: product.description,
-                image: product.image
+                qty: product.qty,
+                category_name: product.category_name,
+                thumbnail: product.thumbnail,
+                price_promotion: product.price_promotion,
+                status: product.status
             })
             );
             return res.status(200).json({ product_list });
         }
     } catch (error) {
-        return res.status(400).json({ message: error.message });
+        return res.status(500).json({ message: error.message });
     }
 }
 export const category_product = async (req, res) => {

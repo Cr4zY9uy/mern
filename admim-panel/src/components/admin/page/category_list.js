@@ -11,9 +11,9 @@ import { AdvancedImage } from '@cloudinary/react';
 import { delete_category_all, list_category, list_category_paginate } from '../../../services/category_service';
 import { useEffect, useState } from 'react';
 import { Store } from 'react-notifications-component';
-import Delete_Modal from '../layout/modal_del';
+import DeleteModal from '../layout/modal_del';
 import { Pagination } from 'antd';
-function Category_List() {
+function CategoryList() {
     document.title = "Category list";
 
     const [type, setType] = useState("");
@@ -27,6 +27,7 @@ function Category_List() {
     const cate_list = async () => {
         try {
             const rs = await list_category_paginate(page);
+            setDelStatus(false)
             setCategory(rs.data.category_list);
             setTotalProducts(rs.data.total_product);
             if (rs.status !== 200) {
@@ -75,6 +76,7 @@ function Category_List() {
         cate_list();
         setType("category");
     }, [delStatus, page])
+
     const showModal = () => {
         setIsModalOpen(true);
     };
@@ -119,12 +121,12 @@ function Category_List() {
                                         <Button variant='danger'
 
                                             onClick={delete_all}
-                                        ><i class="bi bi-trash-fill"></i></Button>
+                                        ><i className="bi bi-trash-fill"></i></Button>
                                     </div>
                                 </div>
                             </th>
                             <th colSpan={8} className='wrap_insert'>
-                                <Button variant='success' onClick={() => { navigate('/category/add') }}><i class="bi bi-plus-lg"></i></Button>
+                                <Button variant='success' onClick={() => { navigate('/category/add') }}><i className="bi bi-plus-lg"></i></Button>
                             </th>
                         </tr>
                         <tr>
@@ -153,7 +155,7 @@ function Category_List() {
                                         <Button variant='danger' style={{ marginRight: "10px" }} onClick={() => {
                                             showModal();
                                             setDelID(item.category_id)
-                                        }}><i class="bi bi-trash-fill"></i></Button>
+                                        }}><i className="bi bi-trash-fill"></i></Button>
                                         <Button variant='warning' onClick={() => { navigate(`/category/edit/${item.category_id}`) }}><FormOutlined /></Button>
                                     </div>
                                 </td>
@@ -168,8 +170,8 @@ function Category_List() {
                     current={page}
                     onChange={(page) => setPage(page)} />
             </div >
-            <Delete_Modal status={isModalOpen} onOk={handleModalOk} onCancel={handleModalCancel} type_del={type} id_del={delID} onDel={onDelete} />
+            <DeleteModal status={isModalOpen} onOk={handleModalOk} onCancel={handleModalCancel} type_del={type} id_del={delID} onDel={onDelete} />
         </>
     );
 }
-export default Category_List;
+export default CategoryList;

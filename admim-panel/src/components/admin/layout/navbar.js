@@ -5,10 +5,11 @@ import {
     FolderOpenOutlined,
     FileZipOutlined,
     UserOutlined,
-    ShoppingCartOutlined,
     UsergroupDeleteOutlined,
 } from '@ant-design/icons';
 import { Menu, ConfigProvider, Layout } from 'antd';
+import { useContext } from "react";
+import { AppContext } from "../../../context/app_context";
 function getItem(label, key, icon, children, type) {
     return {
         key,
@@ -18,7 +19,8 @@ function getItem(label, key, icon, children, type) {
         type,
     };
 }
-function Navbar({ collapsed }) {
+function Navbar() {
+    const { isOpen } = useContext(AppContext);
     const { Sider } = Layout;
     const items = [
         getItem('Product & Category', '1', <FolderOpenOutlined />, [
@@ -39,7 +41,7 @@ function Navbar({ collapsed }) {
                 }
             }}
         >
-            <Sider trigger={null} collapsible collapsed={collapsed} className="side_bar">
+            <Sider trigger={null} collapsible collapsed={isOpen} className="side_bar">
                 <div className="logo"><NavLink to={"/"}>S-cart <span>admin</span></NavLink></div>
                 <Menu
                     mode="inline"

@@ -32,7 +32,7 @@ function EditCategory() {
         try {
             const rs = await detail_category(id);
             setCategory(rs.data.category);
-            setData({ name: rs.data.category.name, category: rs.data.category.description })
+            setData({ name: rs.data.category.name, description: rs.data.category.description })
             if (rs.status !== 200) {
                 console.log(rs.statusText)
             }
@@ -43,14 +43,14 @@ function EditCategory() {
         }
 
     }
-    const onFinishFailed = (errorInfo) => {
-        return errorInfo;
-    };
-    console.log(data, category);
+
 
     useEffect(() => {
         category_detail();
     }, [])
+    useEffect(() => {
+        console.log({ ...data, image });
+    }, [image])
     useEffect(() => {
         if (category) {
             form.setFieldValue("name", category.name)
@@ -63,6 +63,7 @@ function EditCategory() {
             cloudName: 'dv7ni8uod'
         }
     });
+
     const handleSubmit = async () => {
 
         try {
@@ -138,7 +139,6 @@ function EditCategory() {
                 bordered={false}>
                 <Form {...formItemLayout} style={{ maxWidth: 600 }} onFinish={handleSubmit}
                     form={form}
-                    onFinishFailed={onFinishFailed}
                 >
                     <Form.Item
                         label="Name"

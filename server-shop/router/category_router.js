@@ -19,11 +19,11 @@ router.post("/category/add", checkAuth, add_category_validator, add_category);
 router.put("/category/edit/:id", checkAuth, edit_category_validator, edit_category);
 
 router.get("/category", all_category);
-router.get("/category", paginate_category);
-router.get("/category/delete/:id", checkAuth, delete_category_one);
-router.get("/category/delete", checkAuth, delete_category_list);
-router.get("/category/delete", checkAuth, delete_category_all);
-router.get("/category/:id", detail_category);
+router.get("/category_paginate", paginate_category);
+router.get("/category_detail/:id", detail_category);
 
+router.delete("/category/delete/:id", checkAuth, delete_category_one);
+router.delete("/category/delete_list", checkAuth, delete_category_list);
+router.delete("/category/delete_all", checkAuth, delete_category_all);
 
 export default router;

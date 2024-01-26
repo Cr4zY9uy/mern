@@ -1,12 +1,15 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import "./../style/login.css";
 import { Button, FloatingLabel, Form } from "react-bootstrap";
 import { useNavigate } from "react-router";
 import { login } from "../../../services/user_service";
 import USER_ACTION from "../../../redux/user/user_action";
 import { connect } from "react-redux";
+import { AppContext } from "../../../context/app_context";
+import { Store } from "react-notifications-component";
 function Login(props) {
     const [info, setInfo] = useState({});
+    const { isLog, setIsLog } = useContext(AppContext)
     const navigate = useNavigate();
     const hanldeInput = (e) => {
         setInfo({ ...info, [e.target.name]: e.target.value });
@@ -16,10 +19,37 @@ function Login(props) {
         try {
             const rs = await login(info);
             if (rs.status !== 200) {
-                alert("Login fail! Retry")
+                setIsLog(isLog);
+                Store.addNotification({
+                    title: "Failure!!",
+                    message: "You login unsuccessfully!",
+                    type: "danger",
+                    insert: "top",
+                    container: "top-center",
+                    animationIn: ["animate__animated", "animate__fadeIn"],
+                    animationOut: ["animate__animated", "animate__fadeOut"],
+                    dismiss: {
+                        duration: 2000,
+                        onScreen: true
+                    }
+                });
             }
             else {
-                props.login(rs.data)
+                props.login(rs.data);
+                setIsLog(!isLog);
+                Store.addNotification({
+                    title: "Sucess!!",
+                    message: "You login successfully!",
+                    type: "success",
+                    insert: "top",
+                    container: "top-center",
+                    animationIn: ["animate__animated", "animate__fadeIn"],
+                    animationOut: ["animate__animated", "animate__fadeOut"],
+                    dismiss: {
+                        duration: 2000,
+                        onScreen: true
+                    }
+                });
                 navigate("/admin");
             }
         } catch (error) {

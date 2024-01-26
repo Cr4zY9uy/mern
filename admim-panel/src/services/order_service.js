@@ -34,8 +34,8 @@ export const edit_order = async (id, order) => {
     }
 
 }
-export const delete_order = async (id) => {
-    const url = URL.ORDER.DELETE + id;
+export const delete_order_id = async (id) => {
+    const url = URL.ORDER.DELETE_ID + id;
     try {
         const rs = await api.delete(url)
         return rs;
@@ -57,3 +57,14 @@ export const delete_order_all = async () => {
 
 }
 
+export const delete_order_list = async () => {
+    const url = URL.ORDER.DELETE_LIST;
+    try {
+        const rs = await api.delete(url)
+        return rs;
+    }
+    catch (error) {
+        return {};
+
+    }
+}

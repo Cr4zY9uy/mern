@@ -11,9 +11,9 @@ import { Store } from 'react-notifications-component';
 import { delete_product_all, paginate_product } from '../../../services/product_service';
 import { AdvancedImage } from '@cloudinary/react';
 import { fill } from '@cloudinary/url-gen/actions/resize';
-import Delete_Modal from '../layout/modal_del';
+import DeleteModal from '../layout/modal_del';
 import { Pagination } from 'antd';
-function Product_List() {
+function ProductList() {
     document.title = "Product list";
     const [type, setType] = useState("");
     const [product, setProduct] = useState([]);
@@ -27,6 +27,7 @@ function Product_List() {
         try {
             const rs = await paginate_product(page);
             setProduct(rs.data.product_list);
+            setDelStatus(false)
             setTotalProducts(rs.data.total_product)
             if (rs.status !== 200) {
                 console.log(rs.statusText)
@@ -81,7 +82,7 @@ function Product_List() {
         setIsModalOpen(false);
     };
     const onDelete = () => {
-        setDelStatus(prevDelStatus => !prevDelStatus);
+        setDelStatus(true);
     }
     const handleModalCancel = () => {
         setIsModalOpen(false);
@@ -115,12 +116,12 @@ function Product_List() {
                                 </div>
                                 <div className="del">
                                     <Button variant='danger'
-                                        onClick={delete_all}><i class="bi bi-trash-fill"></i></Button>
+                                        onClick={delete_all}><i className="bi bi-trash-fill"></i></Button>
                                 </div>
                             </div>
                         </th>
                         <th colSpan={9} className='wrap_insert'>
-                            <Button variant='success' onClick={() => { navigate('/product/add') }}><i class="bi bi-plus-lg"></i></Button>
+                            <Button variant='success' onClick={() => { navigate('/product/add') }}><i className="bi bi-plus-lg"></i></Button>
                         </th>
                     </tr>
                     <tr>
@@ -159,7 +160,7 @@ function Product_List() {
                                         <Button variant='danger' style={{ marginRight: "10px" }} onClick={() => {
                                             showModal();
                                             setDelID(item.product_id)
-                                        }}><i class="bi bi-trash-fill"></i></Button>
+                                        }}><i className="bi bi-trash-fill"></i></Button>
                                         <Button variant='warning' onClick={() => { navigate(`/product/edit/${item.product_id}`) }}><FormOutlined /></Button>
                                     </div>
                                 </td>
@@ -173,8 +174,8 @@ function Product_List() {
                 pageSize={9}
                 current={page}
                 onChange={(page) => setPage(page)} />
-            <Delete_Modal status={isModalOpen} onOk={handleModalOk} onCancel={handleModalCancel} type_del={type} id_del={delID} onDel={onDelete} />
+            <DeleteModal status={isModalOpen} onOk={handleModalOk} onCancel={handleModalCancel} type_del={type} id_del={delID} onDel={onDelete} />
         </div>
     );
 }
-export default Product_List;
+export default ProductList;

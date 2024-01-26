@@ -24,16 +24,16 @@ router.post("/product/add", checkAuth, add_product_validator, add_product);
 router.put("/product/edit/:id", checkAuth, edit_product_validator, edit_product);
 
 router.get("/product", all_product);
-router.get("/product", paginate_product);
-router.get("/product/:id", detail_product);
+router.get("/product_paginate", paginate_product);
+router.get("/product_detail/:id", detail_product);
 router.get("/product/hot", hot_product);
 router.get("/product/category/:name", category_product);
 router.get("/product/code/:id", by_code_product);
 router.get("/product/name/:name", by_name_product);
 
 router.delete("/product/delete/:id", checkAuth, delete_product_one);
-router.delete("/product/delete", checkAuth, delete_product_list);
-router.delete("/product/delete", checkAuth, delete_product_all);
+router.delete("/product/delete_list", checkAuth, delete_product_list);
+router.delete("/product/delete_all", checkAuth, delete_product_all);
 
 
 export default router;

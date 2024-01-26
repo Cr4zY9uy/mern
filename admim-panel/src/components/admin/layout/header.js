@@ -1,5 +1,5 @@
 import "./../style/header.css";
-import { useEffect, useState } from "react";
+import { useContext } from "react";
 import { Button } from "antd";
 import {
     MenuFoldOutlined,
@@ -9,16 +9,11 @@ import { connect } from "react-redux";
 import USER_ACTION from "../../../redux/user/user_action";
 import { useNavigate } from "react-router";
 import { logout } from "../../../services/user_service";
+import { AppContext } from "../../../context/app_context";
 function Header(props) {
-    const [collapsed, setCollapsed] = useState(false);
     const user = props.state.currentUser.name;
     const navigate = useNavigate();
-    const toggleCollapsed = () => {
-        const newCollapsed = !collapsed;
-        setCollapsed(newCollapsed);
-        props.onToggleCollapsed(newCollapsed);
-    };
-
+    const { isOpen, setIsOpen, isLog, setIsLog } = useContext(AppContext);
     const LogOut = async () => {
         try {
             const rs = await logout();
@@ -27,6 +22,7 @@ function Header(props) {
             }
             else {
                 props.logOut();
+                setIsLog(!isLog);
                 navigate("/");
             }
         } catch (error) {
@@ -37,11 +33,11 @@ function Header(props) {
         <div className="header">
             <div className="d-flex justify-content-between align-items-center" style={{ height: "10vh" }}>
                 <Button
-                    onClick={toggleCollapsed}
+                    onClick={() => setIsOpen(!isOpen)}
                     style={{
                         marginBottom: 16,
                     }}
-                >   {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+                >   {isOpen ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
                 </Button>
                 <div className="d-flex align-items-center icon_wrap ">
                     <div className="home"><i className="bi bi-house-door-fill"></i></div>

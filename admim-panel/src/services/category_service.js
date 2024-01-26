@@ -52,8 +52,8 @@ export const edit_category = async (id, category) => {
         return {};
     }
 }
-export const delete_category = async (id) => {
-    const url = URL.CATEGORY.DELETE + id;
+export const delete_category_id = async (id) => {
+    const url = URL.CATEGORY.DELETE_ID + id;
     try {
         const rs = await api.delete(url)
         return rs;
@@ -70,5 +70,16 @@ export const delete_category_all = async () => {
     }
     catch (error) {
         return {};
+    }
+}
+export const delete_category_list = async () => {
+    const url = URL.CATEGORY.DELETE_LIST;
+    try {
+        const rs = await api.delete(url)
+        return rs;
+    }
+    catch (error) {
+        return {};
+
     }
 }

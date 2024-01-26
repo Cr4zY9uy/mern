@@ -11,7 +11,8 @@ import {
     Radio,
     Upload,
     Button,
-    Space
+    Space,
+    InputNumber
 } from 'antd';
 import { useEffect, useState } from "react";
 import { Store } from "react-notifications-component";
@@ -37,7 +38,7 @@ function EditProduct() {
     };
     const navigate = useNavigate();
     const [data, setData] = useState({});
-    const [image, setImage] = useState("");
+    const [thumbnail, setThumbnail] = useState("");
     const [category_name, setCategoryName] = useState("");
     const { id } = useParams();
     const [product, setProduct] = useState({});
@@ -46,6 +47,7 @@ function EditProduct() {
         try {
             const rs = await list_category();
             setCategory(rs.data.category_list);
+
             if (rs.status !== 200) {
                 console.log(rs.statusText)
             }
@@ -55,13 +57,26 @@ function EditProduct() {
             }
         }
     }
+    const changeHandler = name => value => {
+        setData({ ...data, [name]: value });
+    };
     useEffect(() => {
-        console.log({ ...data, image, category_name });
+        console.log({ ...data, thumbnail, category_name });
     }, [data])
     const product_detail_code = async () => {
         try {
             const rs = await detail_product_code(id);
-            setProduct(rs.data.product[0]);
+            setProduct(rs.data.product);
+            setCategoryName(rs.data.product.category_name);
+            setData({
+                title: rs.data.product.title,
+                price: rs.data.product.price,
+                description: rs.data.product.description,
+                qty: rs.data.product.qty,
+                category_name: rs.data.product.category_name,
+                price_promotion: rs.data.product.price_promotion,
+                status: rs.data.product.status
+            })
             if (rs.status !== 200) {
                 console.log(rs.statusText)
             }
@@ -79,7 +94,7 @@ function EditProduct() {
     });
     useEffect(() => {
         product_detail_code();
-        console.log(product);
+
     }, [])
     useEffect(() => {
         cate_list();
@@ -90,8 +105,8 @@ function EditProduct() {
     }
     const handleSubmit = async () => {
         try {
-            const res = await edit_product({ ...data, image, category_name });
-            if (res.status === 201) {
+            const res = await edit_product(id, { ...data, thumbnail, category_name });
+            if (res.status === 200) {
                 Store.addNotification({
                     title: "Sucess!!",
                     message: "You edit a product successfully!",
@@ -105,7 +120,9 @@ function EditProduct() {
                         onScreen: true
                     }
                 });
-                navigate("/product")
+                setTimeout(() => {
+                    navigate("/product")
+                }, 2000);
             }
             else {
                 Store.addNotification({
@@ -141,7 +158,7 @@ function EditProduct() {
     const handleImage = (file) => {
         const reader = new FileReader();
         reader.onload = (e) => {
-            setImage(e.target.result);
+            setThumbnail(e.target.result);
         };
         reader.readAsDataURL(file);
         return false;
@@ -191,7 +208,7 @@ function EditProduct() {
                             }]}>
                         <Select allowClear name="category_name" onChange={value => setCategoryName(value)} >
                             {category.map((item) => (
-                                <Option value={item.name} style={{ height: 50 }}>{item.name}</Option>
+                                <Option key={item.category_id} value={item.name} style={{ height: 50 }}>{item.name}</Option>
                             ))}
                         </Select>
                     </Form.Item>
@@ -202,18 +219,10 @@ function EditProduct() {
                         rules={[
                             {
                                 required: true
-                            },
-                            {
-                                min: 0,
-                                message: "Minimum 0 "
-                            },
-                            {
-                                max: 999,
-                                message: "Maximum 999 "
                             }
                         ]}
                     >
-                        <Input name="price" type="number" onChange={handleInput} />
+                        <InputNumber name="price" min={1} onChange={changeHandler("price")} />
                     </Form.Item>
 
                     <Form.Item label="Quantity"
@@ -222,17 +231,9 @@ function EditProduct() {
                         rules={[
                             {
                                 required: true
-                            },
-                            {
-                                min: 0,
-                                message: "Minimum 0 "
-                            },
-                            {
-                                max: 99,
-                                message: "Maximum 99 "
                             }
                         ]}>
-                        <Input type="number" name="qty" onChange={handleInput} />
+                        <InputNumber name="qty" min={0} onChange={changeHandler("qty")} />
                     </Form.Item>
                     <Form.Item
                         label="Hot status"
@@ -241,7 +242,7 @@ function EditProduct() {
                     >
                         <Radio.Group name="status" style={{ height: 50 }} defaultValue={product.status} className="d-flex align-items-center" onChange={handleInput} >
                             <Radio value={1}>On</Radio>
-                            <Radio value={2} checked>Off</Radio>
+                            <Radio value={0} checked>Off</Radio>
                         </Radio.Group>
                     </Form.Item>
 
@@ -251,17 +252,9 @@ function EditProduct() {
                         rules={[
                             {
                                 required: true
-                            },
-                            {
-                                min: 0,
-                                message: "Minimum 0 "
-                            },
-                            {
-                                max: 1,
-                                message: "Maximum 1"
                             }
                         ]}>
-                        <Input type="number" name="price_promotion" onChange={handleInput} />
+                        <InputNumber name="price_promotion" min={0} max={1} onChange={changeHandler("price_promotion")} />
                     </Form.Item>
                     <Form.Item label="Description"
                         hasFeedback
@@ -289,12 +282,7 @@ function EditProduct() {
                         valuePropName="fileList"
                         getValueFromEvent={normFile}
                         extra="Choose an image"
-                        rules={[
-                            {
-                                required: true,
-                                message: "Input that field"
-                            }
-                        ]}
+
                     >
                         <Upload name="image" action="/upload.do" listType="picture" className="d-flex align-items-center" beforeUpload={file => handleImage(file)}>
                             <Button icon={<UploadOutlined />}>Click to upload</Button>

@@ -52,8 +52,8 @@ export const edit_product = async (id, product) => {
         return {};
     }
 }
-export const delete_product = async (id) => {
-    const url = URL.PRODUCT.DELETE + id;
+export const delete_product_id = async (id) => {
+    const url = URL.PRODUCT.DELETE_ID + id;
     try {
         const rs = await api.delete(url)
         return rs;
@@ -65,6 +65,17 @@ export const delete_product = async (id) => {
 }
 export const delete_product_all = async () => {
     const url = URL.PRODUCT.DELETE_ALL;
+    try {
+        const rs = await api.delete(url)
+        return rs;
+    }
+    catch (error) {
+        return {};
+
+    }
+}
+export const delete_product_list = async () => {
+    const url = URL.PRODUCT.DELETE_LIST;
     try {
         const rs = await api.delete(url)
         return rs;

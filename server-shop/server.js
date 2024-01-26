@@ -11,8 +11,8 @@ import cookieParser from "cookie-parser";
 const app = Express();
 dotenv.config();
 
-app.use(Express.json());
-app.use(Express.urlencoded({ extended: true }));
+app.use(Express.json({ limit: '10MB' }));
+app.use(Express.urlencoded({ extended: true, limit: "60mb" }));
 app.use(cors({ credentials: true, origin: "http://localhost:3000" }));
 app.use(cookieParser());
 

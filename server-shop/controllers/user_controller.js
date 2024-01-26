@@ -6,16 +6,16 @@ import { validationResult } from "express-validator";
 
 
 export const login = async (req, res) => {
-   
+
     try {
         const data = req.body;
         const user = await user_model.findOne({ username: data.username });
         if (!user) {
-            return res.status(400).json({ message: "Username not existed" });
+            return res.status(404).json({ message: "Username not existed" });
         }
         const verify = await bcrypt.compare(data.password, user.password);
         if (!verify) {
-            return res.status(400).json({ message: "Password not true" });
+            return res.status(404).json({ message: "Password not true" });
         }
         const accessTokenLife = process.env.ACCESS_TOKEN_LIFE;
         const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
@@ -26,7 +26,7 @@ export const login = async (req, res) => {
         const accessToken = jwt.sign(dataForAccessToken, accessTokenSecret, { expiresIn: accessTokenLife });
         if (!accessToken) {
             return res
-                .status(400)
+                .status(401)
                 .json({ message: 'Login fail, retry' });
         }
         let refreshToken = randToken.generate(12);
@@ -49,7 +49,7 @@ export const login = async (req, res) => {
     }
 }
 export const register = async (req, res) => {
-    
+
     try {
         const data = req.body;
         const checkUsername = await user_model.findOne({ username: data.username });

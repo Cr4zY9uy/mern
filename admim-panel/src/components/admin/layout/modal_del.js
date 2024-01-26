@@ -2,10 +2,10 @@ import Modal from 'antd/es/modal/Modal';
 import '../style/modal_del.css';
 import { Store } from 'react-notifications-component';
 import { Button } from 'react-bootstrap';
-import { delete_category } from '../../../services/category_service';
-import { delete_product } from '../../../services/product_service';
-import { delete_order } from '../../../services/order_service';
-function Delete_Modal(props) {
+import { delete_category_id } from '../../../services/category_service';
+import { delete_product_id } from '../../../services/product_service';
+import { delete_order_id } from '../../../services/order_service';
+function DeleteModal(props) {
     const isModalOpen = props.status;
     const id_del = props.id_del;
     const type = props.type_del;
@@ -13,13 +13,13 @@ function Delete_Modal(props) {
         try {
             let res = {};
             if (type === "category") {
-                res = await delete_category(id_del);
+                res = await delete_category_id(id_del);
             }
             if (type === "product") {
-                res = await delete_product(id_del);
+                res = await delete_product_id(id_del);
             }
             if (type === "order") {
-                res = await delete_order(id_del);
+                res = await delete_order_id(id_del);
             }
             if (res.status === 200) {
                 Store.addNotification({
@@ -75,4 +75,4 @@ function Delete_Modal(props) {
         </Modal >
     );
 }
-export default Delete_Modal;
+export default DeleteModal;

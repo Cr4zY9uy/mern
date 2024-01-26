@@ -70,10 +70,17 @@ export const detail_category = async (req, res) => {
         }
         else {
 
-            return res.status(200).json({ data });
+            return res.status(200).json({
+                category: {
+                    category_id: data.category_id,
+                    name: data.name,
+                    description: data.description,
+                    image: data.image
+                }
+            });
         }
     } catch (error) {
-        return res.status(400).json({ message: error.message });
+        return res.status(500).json({ message: error.message });
     }
 }
 
@@ -87,7 +94,7 @@ export const delete_category_one = async (req, res) => {
             return res.status(404).json({ message: "Category not found" });
         }
     } catch (error) {
-        return res.status(400).json({ message: error.message });
+        return res.status(500).json({ message: error.message });
     }
 }
 
@@ -100,7 +107,7 @@ export const delete_category_all = async (req, res) => {
             return res.status(404).json({ message: "Categories not found" });
         }
     } catch (error) {
-        return res.status(400).json({ message: error.message });
+        return res.status(500).json({ message: error.message });
     }
 }
 export const delete_category_list = async (req, res) => {
@@ -127,12 +134,9 @@ export const paginate_category = async (req, res) => {
     try {
         const dataAll = await category_model.find().sort({ createdAt: -1 });
         const data = dataAll.slice(skip, skip + limit);
-        if (data.length === 0) {
-            return res.status(400).json({ message: "No category" });
-        }
         const total_page = Math.ceil(dataAll.length / limit);
         if (data.length === 0) {
-            return res.status(400).json({ message: "No category" });
+            return res.status(404).json({ message: "No category" });
         }
         else {
             const category_list = data.map((category) => ({
@@ -145,7 +149,7 @@ export const paginate_category = async (req, res) => {
             return res.status(200).json({ category_list, total_page: total_page, total_product: dataAll.length, page: page });
         }
     } catch (error) {
-        return res.status(400).json({ message: error.message });
+        return res.status(500).json({ message: error.message });
     }
 }
 export const all_category = async (req, res) => {
@@ -153,10 +157,7 @@ export const all_category = async (req, res) => {
     try {
         const data = await category_model.find().sort({ createdAt: -1 });
         if (data.length === 0) {
-            return res.status(400).json({ message: "No category" });
-        }
-        if (data.length === 0) {
-            return res.status(400).json({ message: "No category" });
+            return res.status(404).json({ message: "No category" });
         }
         else {
             const category_list = data.map((category) => ({
@@ -169,6 +170,6 @@ export const all_category = async (req, res) => {
             return res.status(200).json({ category_list });
         }
     } catch (error) {
-        return res.status(400).json({ message: error.message });
+        return res.status(500).json({ message: error.message });
     }
 }

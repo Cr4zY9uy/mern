@@ -11,7 +11,8 @@ import {
     Radio,
     Upload,
     Button,
-    Space
+    Space,
+    InputNumber
 } from 'antd';
 import { useEffect, useState } from "react";
 import { add_product } from "../../../services/product_service";
@@ -23,13 +24,17 @@ function AddProduct() {
     const { Option } = Select;
     const navigate = useNavigate();
     const [form] = Form.useForm();
-    const [data, setData] = useState({});
-    const [image, setImage] = useState("");
+    const [status, setStatus] = useState(0)
+    const [data, setData] = useState({ status: 0 });
+    const [thumbnail, setThumbnail] = useState("");
     const [category_name, setCategoryName] = useState("");
     const handleInput = (e) => {
+
         setData({ ...data, [e.target.name]: e.target.value });
     }
-
+    const changeHandler = name => value => {
+        setData({ ...data, [name]: value });
+    };
     const formItemLayout = {
         labelCol: {
             xs: { span: 30 },
@@ -61,7 +66,7 @@ function AddProduct() {
 
     const handleSubmit = async () => {
         try {
-            const res = await add_product({ ...data, image, category_name });
+            const res = await add_product({ ...data, status, thumbnail, category_name });
             if (res.status === 201) {
                 Store.addNotification({
                     title: "Sucess!!",
@@ -100,12 +105,12 @@ function AddProduct() {
 
     };
     useEffect(() => {
-        console.log({ ...data, image, category_name })
+        console.log({ ...data, status, thumbnail, category_name })
     }, [category_name])
     const handleImage = (file) => {
         const reader = new FileReader();
         reader.onload = (e) => {
-            setImage(e.target.result);
+            setThumbnail(e.target.result);
         };
         reader.readAsDataURL(file);
         return false;
@@ -177,7 +182,7 @@ function AddProduct() {
                     >
                         <Select allowClear onChange={value => setCategoryName(value)} >
                             {category.map((item) => (
-                                <Option value={item.name} style={{ height: 50 }}>{item.name}</Option>
+                                <Option key={item.category_id} value={item.name} style={{ height: 50 }}>{item.name}</Option>
                             ))}
                         </Select>
                     </Form.Item>
@@ -188,18 +193,10 @@ function AddProduct() {
                         rules={[
                             {
                                 required: true
-                            },
-                            {
-                                min: 0,
-                                message: "Minimum 0 "
-                            },
-                            {
-                                max: 999,
-                                message: "Maximum 999 "
                             }
                         ]}
                     >
-                        <Input name="price" type="number" onChange={handleInput} />
+                        <InputNumber name="price" min={1} onChange={changeHandler("price")} />
                     </Form.Item>
 
                     <Form.Item label="Quantity"
@@ -208,26 +205,17 @@ function AddProduct() {
                         rules={[
                             {
                                 required: true
-                            },
-                            {
-                                min: 0,
-                                message: "Minimum 0 "
-                            },
-                            {
-                                max: 99,
-                                message: "Maximum 99 "
                             }
                         ]}>
-                        <Input type="number" name="qty" onChange={handleInput} />
+                        <InputNumber name="qty" min={0} onChange={changeHandler("qty")} />
                     </Form.Item>
                     <Form.Item
                         label="Hot status"
                         hasFeedback
                         name="status"
-
-                        onChange={handleInput}
                     >
-                        <Radio.Group style={{ height: 50 }} defaultValue={0} name="status" className="d-flex align-items-center">
+                        <Radio.Group style={{ height: 50 }} defaultValue={0} name="status" className="d-flex align-items-center" onChange={handleInput}
+                        >
                             <Radio value={1}>On</Radio>
                             <Radio value={0} checked>Off</Radio>
                         </Radio.Group>
@@ -239,17 +227,9 @@ function AddProduct() {
                         rules={[
                             {
                                 required: true
-                            },
-                            {
-                                min: 0,
-                                message: "Minimum 0 "
-                            },
-                            {
-                                max: 1,
-                                message: "Maximum 1"
                             }
                         ]}>
-                        <Input type="number" name="price_promotion" onChange={handleInput} />
+                        <InputNumber name="price_promotion" min={0} max={1} onChange={changeHandler("price_promotion")} />
                     </Form.Item>
                     <Form.Item label="Description"
                         rules={[
@@ -280,7 +260,7 @@ function AddProduct() {
                             }
                         ]}
                     >
-                        <Upload name="image" action="/upload.do" listType="picture" className="d-flex align-items-center" beforeUpload={file => handleImage(file)}>
+                        <Upload name="thumbnail" action="/upload.do" listType="picture" className="d-flex align-items-center" beforeUpload={file => handleImage(file)}>
                             <Button icon={<UploadOutlined />}>Click to upload</Button>
                         </Upload>
                     </Form.Item>

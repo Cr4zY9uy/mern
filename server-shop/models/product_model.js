@@ -30,7 +30,7 @@ const product_schema = new mongoose.Schema({
     category_name: {
         type: String,
         require: true,
-        min: 6,
+        min: 5,
         max: 50
     },
     thumbnail: {

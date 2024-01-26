@@ -9,7 +9,8 @@ import {
     Select,
     Button,
     Space,
-    Divider
+    Divider,
+    InputNumber
 } from 'antd';
 import { Table } from "react-bootstrap";
 import { useEffect, useState } from "react";
@@ -34,6 +35,9 @@ function EditOrder() {
             cloudName: 'dv7ni8uod'
         }
     });
+    const changeHandler = name => value => {
+        setData({ ...data, [name]: value });
+    };
     const load_order = async () => {
 
         try {
@@ -42,7 +46,7 @@ function EditOrder() {
             setProduct(rs.data.order.products);
             setSelection({
                 order_status: rs.data.order.order_status,
-                shipping_method: rs.data.order.shipping_cost,
+                shipping_method: rs.data.order.shipping_method,
                 shipping_status: rs.data.order.shipping_status,
                 payment_method: rs.data.order.payment_method,
                 payment_status: rs.data.order.payment_status
@@ -70,9 +74,9 @@ function EditOrder() {
     useEffect(() => {
         load_order();
     }, [])
-    const onFinishFailed = (errorInfo) => {
-        return errorInfo;
-    };
+    const handleInput = (e) => {
+        setData({ ...data, [e.target.name]: e.target.value });
+    }
     const handleSelection = (name, value) => {
         setSelection({ ...selection, [name]: value });
     }
@@ -141,9 +145,7 @@ function EditOrder() {
             form.setFieldValue("note", order.note)
         }
     }, [order])
-    const handleInput = (e) => {
-        setData({ ...data, [e.target.name]: e.target.value });
-    }
+
     const formItemLayout = {
         labelCol: {
             xs: { span: 30 },
@@ -168,9 +170,7 @@ function EditOrder() {
                         hasFeedback
                         name="first_name"
                         rules={[
-                            {
-                                required: true
-                            },
+
                             {
                                 min: 5,
                                 message: "Minimum 5 character"
@@ -189,12 +189,10 @@ function EditOrder() {
                         hasFeedback
                         name="last_name"
                         rules={[
+
                             {
-                                required: true
-                            },
-                            {
-                                min: 5,
-                                message: "Minimum 5 character"
+                                min: 3,
+                                message: "Minimum 3 character"
                             },
                             {
                                 max: 50,
@@ -210,9 +208,7 @@ function EditOrder() {
                         hasFeedback
                         name="phone"
                         rules={[
-                            {
-                                required: true
-                            },
+
                             {
                                 min: 5,
                                 message: "Minimum 5 character"
@@ -231,9 +227,7 @@ function EditOrder() {
                         hasFeedback
                         name="email"
                         rules={[
-                            {
-                                required: true
-                            },
+
                             {
                                 min: 15,
                                 message: "Minimum 5 character"
@@ -252,9 +246,7 @@ function EditOrder() {
                         hasFeedback
                         name="address"
                         rules={[
-                            {
-                                required: true
-                            },
+
                             {
                                 min: 5,
                                 message: "Minimum 5 character"
@@ -273,9 +265,7 @@ function EditOrder() {
                         hasFeedback
                         name="country"
                         rules={[
-                            {
-                                required: true
-                            },
+
                             {
                                 min: 5,
                                 message: "Minimum 5 character"
@@ -347,19 +337,10 @@ function EditOrder() {
                         rules={[
                             {
                                 required: true
-                            },
-                            {
-                                min: 0,
-                                message: "Minimum 0"
-                            },
-
-                            {
-                                max: 1,
-                                message: "Maximum 1"
                             }
                         ]}
                     >
-                        <Input name="discount" type="number" onChange={handleInput} />
+                        <InputNumber name="discount" min={0} max={1} onChange={changeHandler("discount")} />
                     </Form.Item>
                     <Form.Item
                         label="Shipping cost"
@@ -368,14 +349,10 @@ function EditOrder() {
                         rules={[
                             {
                                 required: true
-                            },
-                            {
-                                min: 0,
-                                message: "Minimum 0"
                             }
                         ]}
                     >
-                        <Input name="shipping_cost" type="number" onChange={handleInput} />
+                        <InputNumber name="shipping_cost" min={0} onChange={changeHandler("shipping_cost")} />
                     </Form.Item>
                     <Form.Item
                         label="Other fee"
@@ -384,14 +361,10 @@ function EditOrder() {
                         rules={[
                             {
                                 required: true
-                            },
-                            {
-                                min: 0,
-                                message: "Minimum 5"
                             }
                         ]}
                     >
-                        <Input name="other_fee" type="number" onChange={handleInput} />
+                        <InputNumber name="other_fee" min={0} onChange={changeHandler("other_fee")} />
                     </Form.Item>
                     <Form.Item
                         label="Received(-)"
@@ -400,14 +373,10 @@ function EditOrder() {
                         rules={[
                             {
                                 required: true
-                            },
-                            {
-                                min: 0,
-                                message: "Minimum 0"
                             }
                         ]}
                     >
-                        <Input name="received" type="number" onChange={handleInput} />
+                        <InputNumber name="received" min={0} onChange={changeHandler("received")} />
                     </Form.Item>
                     <Form.Item
                         label="Balance"
@@ -416,27 +385,24 @@ function EditOrder() {
                         rules={[
                             {
                                 required: true
-                            },
-                            {
-                                min: 0,
-                                message: "Minimum 0"
                             }
                         ]}
 
                     >
-                        <Input name="balance" type="number" onChange={handleInput} />
+                        <InputNumber name="balance" min={0} onChange={changeHandler("balance")} />
                     </Form.Item>
                     <Form.Item
                         label="Note"
-                        hasFeedback help="Maximum 300 characters"
                         name="note"
                         validateDebounce={1500}
                         rules={[
                             {
-                                min: 5
+                                min: 5,
+                                message: "Minimum 5 characters"
                             },
                             {
-                                max: 300
+                                max: 300,
+                                message: "Maximum 300 characters"
                             }
                         ]}
                     >
@@ -457,7 +423,7 @@ function EditOrder() {
                         <tbody>
                             {
                                 product.map((item, index) => {
-                                    return <tr>
+                                    return <tr key={index}>
                                         <th>{item.product_id}</th>
                                         <th>
                                             <AdvancedImage cldImg={cld.image(item.thumbnail).resize(fill().width(50).height(50))} />

@@ -20,11 +20,11 @@ router.post("/order/add", checkAuth, add_order_validator, add_order);
 router.put("/order/edit/:id", checkAuth, edit_order_validator, edit_order);
 
 router.get("/order", all_order);
-router.get("/order", paginate_order);
+router.get("/order_paginate", paginate_order);
+router.get("/order_detail/:id", detail_order);
 
 router.delete("/order/delete/:id", checkAuth, delete_order_one);
-router.delete("/order/delete", checkAuth, delete_order_list);
-router.delete("/order/delete", checkAuth, delete_order_all);
-router.delete("/order/:id", detail_order);
+router.delete("/order/delete_list", checkAuth, delete_order_list);
+router.delete("/order/delete_all", checkAuth, delete_order_all);
 
 export default router;

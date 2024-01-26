@@ -1,4 +1,4 @@
-import { check, body, validationResult, param } from "express-validator";
+import { body, validationResult } from "express-validator";
 
 export const add_order_validator = [
     body("order_id")
@@ -81,9 +81,7 @@ export const add_order_validator = [
     }
 ];
 export const edit_order_validator = [
-    param("order_id")
-        .notEmpty().withMessage("Order id is required")
-        .isLength({ min: 5, max: 15 }).withMessage("Order id must be at least 5 characters and maximum 15 characters"),
+
     body("payment_status")
         .notEmpty().withMessage("Payment status is required")
         .isIn(['Unpaid', 'Partial payment', 'Paid', 'Return']).withMessage("Payment status must be in regulation"),

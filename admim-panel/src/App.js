@@ -11,48 +11,45 @@ import EditCategory from './components/admin/page/editCategory';
 import Header from './components/admin/layout/header';
 import Copyright from './components/admin/layout/copyright';
 import Navbar from './components/admin/layout/navbar';
-import Product_List from './components/admin/page/product_list';
-import Category_List from './components/admin/page/category_list';
-import Order_List from './components/admin/page/order_list';
-import { useState } from 'react';
-import { connect } from 'react-redux';
+import ProductList from './components/admin/page/product_list';
+import CategoryList from './components/admin/page/category_list';
+import OrderList from './components/admin/page/order_list';
 import { ReactNotifications } from 'react-notifications-component'
-function App(props) {
+import PageNotFound from './components/admin/page/404notfound';
+import { AppProvider } from './context/app_context';
+import ProtectRouter from './functions/protect_router';
+function App() {
   const location = useLocation();
   const hide = location.pathname === '/';
-  const [navbarCollapsed, setNavbarCollapsed] = useState(false);
-  const handleNavbarCollapse = (collapsed) => {
-    setNavbarCollapsed(collapsed);
-  };
   return (
     <>
       <div className='d-flex'>
-        {!hide && <Navbar collapsed={navbarCollapsed} />}
-        <div className='d-flex flex-column wrap_main'>
-          {!hide && <Header onToggleCollapsed={handleNavbarCollapse} />}
-          <ReactNotifications />
-          <Routes>
-            <Route path='/' element={<Login />} />
-            <Route path='/admin' element={<Admin />} />
-            <Route path='/product' element={<Product_List />} />
-            <Route path='/category' element={<Category_List />} />
-            <Route path='/order/edit/:id' element={<EditOrder />} />
-            <Route path='/product/add' element={<AddProduct />} />
-            <Route path='/category/add' element={<AddCategory />} />
-            <Route path='/product/edit/:id' element={<EditProduct />} />
-            <Route path='/category/edit/:id' element={<EditCategory />} />
-            <Route path='/order' element={<Order_List />} />
-          </Routes>
-          {!hide && <Copyright />}
-        </div>
+        <AppProvider>
+          {!hide && <Navbar />}
+          <div className='d-flex flex-column wrap_main'>
+            {!hide && <Header />}
+            <ReactNotifications />
+            <Routes>
+              <Route path='/' element={<Login />} />
+              <Route element={<ProtectRouter />}>
+                <Route path='/admin' element={<Admin />} />
+                <Route path='/product' element={<ProductList />} />
+                <Route path='/category' element={<CategoryList />} />
+                <Route path='/order/edit/:id' element={<EditOrder />} />
+                <Route path='/product/add' element={<AddProduct />} />
+                <Route path='/category/add' element={<AddCategory />} />
+                <Route path='/product/edit/:id' element={<EditProduct />} />
+                <Route path='/category/edit/:id' element={<EditCategory />} />
+                <Route path='/order' element={<OrderList />} />
+              </Route>
+              <Route path='/*' element={<PageNotFound />} />
+            </Routes>
+            {!hide && <Copyright />}
+          </div>
+        </AppProvider>
       </div>
     </>
   );
 }
 
-const mapStateToProps = (state, ownProps) => {
-  return {
-    state: state.user_reducer
-  }
-}
-export default connect(mapStateToProps, null)(App);
+export default App;
