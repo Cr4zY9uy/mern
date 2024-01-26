@@ -10,6 +10,7 @@ import USER_ACTION from "../../../redux/user/user_action";
 import { useNavigate } from "react-router";
 import { logout } from "../../../services/user_service";
 import { AppContext } from "../../../context/app_context";
+import { Store } from "react-notifications-component";
 function Header(props) {
     const user = props.state.currentUser.name;
     const navigate = useNavigate();
@@ -18,11 +19,37 @@ function Header(props) {
         try {
             const rs = await logout();
             if (rs.status !== 200) {
-                alert("Logout fail! Retry")
+                Store.addNotification({
+                    title: "Failure!!",
+                    message: "You logout unsuccessfully!",
+                    type: "danger",
+                    insert: "top",
+                    container: "top-center",
+                    animationIn: ["animate__animated", "animate__fadeIn"],
+                    animationOut: ["animate__animated", "animate__fadeOut"],
+                    dismiss: {
+                        duration: 2000,
+                        onScreen: true
+                    }
+                });
+
             }
             else {
                 props.logOut();
                 setIsLog(!isLog);
+                Store.addNotification({
+                    title: "Sucess!!",
+                    message: "You logout successfully!",
+                    type: "success",
+                    insert: "top",
+                    container: "top-center",
+                    animationIn: ["animate__animated", "animate__fadeIn"],
+                    animationOut: ["animate__animated", "animate__fadeOut"],
+                    dismiss: {
+                        duration: 2000,
+                        onScreen: true
+                    }
+                });
                 navigate("/");
             }
         } catch (error) {

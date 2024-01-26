@@ -24,11 +24,11 @@ function App() {
   return (
     <>
       <div className='d-flex'>
+        <ReactNotifications />
         <AppProvider>
           {!hide && <Navbar />}
           <div className='d-flex flex-column wrap_main'>
             {!hide && <Header />}
-            <ReactNotifications />
             <Routes>
               <Route path='/' element={<Login />} />
               <Route element={<ProtectRouter />}>

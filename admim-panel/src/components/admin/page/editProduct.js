@@ -120,9 +120,7 @@ function EditProduct() {
                         onScreen: true
                     }
                 });
-                setTimeout(() => {
-                    navigate("/product")
-                }, 2000);
+                navigate("/product")
             }
             else {
                 Store.addNotification({
