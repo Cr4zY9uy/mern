@@ -112,6 +112,7 @@ export const refresh_access_token = async (req, res) => {
 
         const accessTokenLife = process.env.ACCESS_TOKEN_LIFE;
         const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
+        const refresfTokenSecret = process.env.REFRESH_TOKEN_SECRET;
 
         if (!accessToken) {
             return res.status(401).json({ message: "Access token not available" });
@@ -125,8 +126,6 @@ export const refresh_access_token = async (req, res) => {
         if (!decoded) {
             return res.status(404).json({ message: "Not available" });
         }
-
-
         const username = decoded.username;
         const role = decoded.role;
         const user = await user_model.findOne({ username: username });
@@ -139,7 +138,14 @@ export const refresh_access_token = async (req, res) => {
         if (refreshToken !== user.refreshToken) {
             return res.status(403).json({ message: "Not allowed" });
         }
-        
+        // try {
+        //     const checkRT = await jwt.verify(refreshToken, refresfTokenSecret);
+        //     if (checkRT.username !== user.username) {
+        //         return res.status(403).json({ message: "Not allowed" });
+        //     }
+        // } catch (error) {
+        //     return res.status(401).json({ message: error.message });
+        // }
         const dataForAccessToken = {
             username,
             role
@@ -193,7 +199,6 @@ export const refresh_token = async (req, res) => {
             return res.status(406).json({ message: "Not allowed" });
         }
         const dataforRefreshToken = randToken.generate(12);
-
         const refreshTokenNew = jwt.sign({ refresh_token: dataforRefreshToken }, refreshTokenSecret, { expiresIn: refreshTokenLife });
         if (!refreshTokenNew) {
             return res.status(500).json({ message: "System error" });

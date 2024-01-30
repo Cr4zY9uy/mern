@@ -57,7 +57,7 @@ function Login(props) {
                         onScreen: true
                     }
                 });
-
+                
                 navigate("/admin");
 
             }
