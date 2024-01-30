@@ -14,7 +14,8 @@ import { Store } from "react-notifications-component";
 function Header(props) {
     const user = props.state.currentUser.name;
     const navigate = useNavigate();
-    const { isOpen, setIsOpen, isLog, setIsLog } = useContext(AppContext);
+    const { isOpen, setIsOpen } = useContext(AppContext);
+
     const LogOut = async () => {
         try {
             const rs = await logout();
@@ -24,7 +25,7 @@ function Header(props) {
                     message: "You logout unsuccessfully!",
                     type: "danger",
                     insert: "top",
-                    container: "top-center",
+                    container: "top-right",
                     animationIn: ["animate__animated", "animate__fadeIn"],
                     animationOut: ["animate__animated", "animate__fadeOut"],
                     dismiss: {
@@ -36,13 +37,13 @@ function Header(props) {
             }
             else {
                 props.logOut();
-                setIsLog(!isLog);
+                sessionStorage.setItem("isLog", false)
                 Store.addNotification({
                     title: "Sucess!!",
                     message: "You logout successfully!",
                     type: "success",
                     insert: "top",
-                    container: "top-center",
+                    container: "top-right",
                     animationIn: ["animate__animated", "animate__fadeIn"],
                     animationOut: ["animate__animated", "animate__fadeOut"],
                     dismiss: {
@@ -56,6 +57,7 @@ function Header(props) {
             alert(error.message);
         }
     }
+
     return (
         <div className="header">
             <div className="d-flex justify-content-between align-items-center" style={{ height: "10vh" }}>
@@ -67,7 +69,7 @@ function Header(props) {
                 >   {isOpen ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
                 </Button>
                 <div className="d-flex align-items-center icon_wrap ">
-                    <div className="home"><i className="bi bi-house-door-fill"></i></div>
+                    <div className="home" onClick={() => { navigate("/admin") }}><i className="bi bi-house-door-fill"></i></div>
                     <div className="wrap_admin  d-flex justity-content-center align-items-center"><img src="/images/icon/admin.png" alt="logo" />
                         <div className="sub_menu">
                             <div>{user}</div>

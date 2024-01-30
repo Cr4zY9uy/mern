@@ -41,8 +41,12 @@ function Cart(props) {
     };
 
     const plus = (index) => {
+
         const newQuantities = [...quantities];
         newQuantities[index] += 1;
+        if (newQuantities[index] > cart[index].qty - 1) {
+            newQuantities[index] = cart[index].qty;
+        }
         setQuantities(newQuantities);
         updateCartWithQuantity(index, newQuantities[index]);
     };

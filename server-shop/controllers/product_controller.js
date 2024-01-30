@@ -29,6 +29,7 @@ export const add_product = async (req, res) => {
         return res.status(500).json({ message: error.message });
     }
 }
+
 export const edit_product = async (req, res) => {
     try {
         const product_id = req.params.id;
@@ -121,6 +122,7 @@ export const delete_product_all = async (req, res) => {
         return res.status(500).json({ message: error.message });
     }
 }
+
 export const delete_product_list = async (req, res) => {
     try {
         const product_id = req.body.product_id;
@@ -138,6 +140,7 @@ export const delete_product_list = async (req, res) => {
         return res.status(500).json({ message: error.message });
     }
 };
+
 export const paginate_product = async (req, res) => {
     const limit = 9;
     const page = parseInt(req.query.page) ? parseInt(req.query.page) : 1;
@@ -248,6 +251,7 @@ export const hot_product = async (req, res) => {
         return res.status(500).json({ message: error.message });
     }
 }
+
 export const by_code_product = async (req, res) => {
     const limit = 9;
     const page = parseInt(req.query.page) ? parseInt(req.query.page) : 1;
@@ -279,6 +283,7 @@ export const by_code_product = async (req, res) => {
         return res.status(500).json({ message: error.message });
     }
 }
+
 export const by_name_product = async (req, res) => {
     const limit = 9;
     const page = parseInt(req.query.page) ? parseInt(req.query.page) : 1;

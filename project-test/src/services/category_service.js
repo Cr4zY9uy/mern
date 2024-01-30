@@ -7,7 +7,8 @@ export const list_category = async () => {
         return rs;
     }
     catch (error) {
-        return {};
+        return error.response;
+
     }
 }
 export const detail_category = async (id) => {
@@ -17,7 +18,8 @@ export const detail_category = async (id) => {
         return rs;
     }
     catch (error) {
-        return {};
+        return error.response;
+
     }
 }
 

@@ -7,12 +7,12 @@ import Banner_Big from "../layout/banner_big";
 import { useEffect, useState } from "react";
 import { product_by_code, product_by_name } from "../../../services/product_service";
 function Search() {
-    document.title = "Search";
     const { input } = useParams();
     const { option } = useParams();
     const [totalProducts, setTotalProducts] = useState(0);
     const [page, setPage] = useState(1);
     const [product, setProduct] = useState([]);
+
     const load_product = async () => {
         let rs;
         try {
@@ -32,11 +32,16 @@ function Search() {
 
     }
     useEffect(() => {
+        document.title = "Search for " + input;
+    }, [input])
+
+    useEffect(() => {
         load_product();
     }, [option, input, page])
+
     return (
         <div className="search">
-            <Banner_Big />
+            <Banner_Big info={input} />
             <div className="container search_page d-flex flex-column align-items-center">
                 <Breadcrumb>
                     <Breadcrumb.Item>

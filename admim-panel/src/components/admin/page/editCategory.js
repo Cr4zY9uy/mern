@@ -18,6 +18,7 @@ import { useNavigate, useParams } from "react-router";
 import { Store } from "react-notifications-component";
 import { detail_category, edit_category } from "../../../services/category_service";
 import { Cloudinary } from "@cloudinary/url-gen";
+import { refreshAccessToken } from "../../../services/user_service";
 function EditCategory() {
     const navigate = useNavigate();
     const [form] = Form.useForm();
@@ -25,9 +26,52 @@ function EditCategory() {
     const [data, setData] = useState({});
     const [image, setImage] = useState("");
     const { id } = useParams();
+
+    const formItemLayout = {
+        labelCol: {
+            xs: { span: 30 },
+            sm: { span: 6 },
+        },
+        wrapperCol: {
+            xs: { span: 24 },
+            sm: { span: 14 },
+        },
+    };
+
+    useEffect(() => {
+        if (category) {
+            form.setFieldValue("name", category.name)
+            form.setFieldValue("description", category.description)
+        }
+    }, [category])
+
+    const cld = new Cloudinary({
+        cloud: {
+            cloudName: 'dv7ni8uod'
+        }
+    });
+
+    const handleImage = (file) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            setImage(e.target.result);
+        };
+        reader.readAsDataURL(file);
+        return false;
+    };
+
+    const normFile = (e) => {
+        console.log('Upload event:', e);
+        if (Array.isArray(e)) {
+            return e;
+        }
+        return e?.fileList;
+    };
+
     const handleInput = (e) => {
         setData({ ...data, [e.target.name]: e.target.value });
     }
+
     const category_detail = async () => {
         try {
             const rs = await detail_category(id);
@@ -44,25 +88,10 @@ function EditCategory() {
 
     }
 
-
     useEffect(() => {
         category_detail();
     }, [])
-    useEffect(() => {
-        console.log({ ...data, image });
-    }, [image])
-    useEffect(() => {
-        if (category) {
-            form.setFieldValue("name", category.name)
-            form.setFieldValue("description", category.description)
-        }
-    }, [category])
 
-    const cld = new Cloudinary({
-        cloud: {
-            cloudName: 'dv7ni8uod'
-        }
-    });
 
     const handleSubmit = async () => {
 
@@ -74,7 +103,7 @@ function EditCategory() {
                     message: "You edit a category successfully!",
                     type: "success",
                     insert: "top",
-                    container: "top-center",
+                    container: "top-right",
                     animationIn: ["animate__animated", "animate__fadeIn"],
                     animationOut: ["animate__animated", "animate__fadeOut"],
                     dismiss: {
@@ -84,13 +113,14 @@ function EditCategory() {
                 });
                 navigate("/category")
             }
-            else {
+            else if (res.status === 401 && res.data.message === "jwt expired") {
+                console.log("fetched");
                 Store.addNotification({
-                    title: "Failure!!",
-                    message: "You edit a category unsuccessfully!",
-                    type: "danger",
+                    title: "Warning!!",
+                    message: "You can retry to edit a category now!",
+                    type: "warning",
                     insert: "top",
-                    container: "top-center",
+                    container: "top-right",
                     animationIn: ["animate__animated", "animate__fadeIn"],
                     animationOut: ["animate__animated", "animate__fadeOut"],
                     dismiss: {
@@ -98,39 +128,53 @@ function EditCategory() {
                         onScreen: true
                     }
                 });
+                try {
+                    const rs = await refreshAccessToken();
+                    if (rs.status !== 201) {
+                        console.log("ferch11");
+                        Store.addNotification({
+                            title: "Failure!!",
+                            message: "You can't edit a category right now!",
+                            type: "danger",
+                            insert: "top",
+                            container: "top-right",
+                            animationIn: ["animate__animated", "animate__fadeIn"],
+                            animationOut: ["animate__animated", "animate__fadeOut"],
+                            dismiss: {
+                                duration: 2000,
+                                onScreen: true
+                            }
+                        });
+                        navigate("/category");
+                    }
+                } catch (error) {
+                    console.log(error);
+                }
+            } else {
+                console.log("ferch12221");
+                Store.addNotification({
+                    title: "Failure!!",
+                    message: "You can't edit a category right now!",
+                    type: "danger",
+                    insert: "top",
+                    container: "top-right",
+                    animationIn: ["animate__animated", "animate__fadeIn"],
+                    animationOut: ["animate__animated", "animate__fadeOut"],
+                    dismiss: {
+                        duration: 2000,
+                        onScreen: true
+                    }
+                });
+                navigate("/category");
             }
+
         } catch (error) {
-            console.log(error.message);
+            console.log(error);
         }
 
-
     };
 
-    const handleImage = (file) => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            setImage(e.target.result);
-        };
-        reader.readAsDataURL(file);
-        return false;
-    };
-    const formItemLayout = {
-        labelCol: {
-            xs: { span: 30 },
-            sm: { span: 6 },
-        },
-        wrapperCol: {
-            xs: { span: 24 },
-            sm: { span: 14 },
-        },
-    };
-    const normFile = (e) => {
-        console.log('Upload event:', e);
-        if (Array.isArray(e)) {
-            return e;
-        }
-        return e?.fileList;
-    };
+
     return (
         <div className="edit_category_panel container">
             <h2 className='caption'><FormOutlined />Edit category</h2>

@@ -20,8 +20,13 @@ function Category() {
             console.log(err.message);
         }
     }
+
     useEffect(() => {
         load_product_cate();
+    }, [name, page])
+    
+    useEffect(() => {
+        document.title = name;
     }, [name])
     return (
         <div className="category">

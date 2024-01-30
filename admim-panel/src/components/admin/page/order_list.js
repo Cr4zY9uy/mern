@@ -11,6 +11,7 @@ import { delete_order_all, list_order } from '../../../services/order_service';
 import DeleteModal from '../layout/modal_del';
 import convertToDate from '../../../functions/convertDate';
 import { Pagination } from 'antd';
+import { refreshAccessToken } from '../../../services/user_service';
 function OrderList() {
     document.title = "Order list";
     const [type, setType] = useState("");
@@ -21,56 +22,7 @@ function OrderList() {
     const navigate = useNavigate();
     const [delStatus, setDelStatus] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
-
-    const cate_list = async () => {
-        try {
-            const rs = await list_order(page);
-            setOrder(rs.data.order_list);
-            setDelStatus(false);
-            setTotalProducts(rs.data.total_product);
-            if (rs.status !== 200) {
-                console.log(rs.statusText)
-            }
-        } catch (err) {
-            if (err.response) {
-                console.log(err.response.status);
-            }
-        }
-    }
-
-    const delete_all = async () => {
-        const res = await delete_order_all();
-        if (res.status === 200) {
-            Store.addNotification({
-                title: "Warning!!",
-                message: "You delete all orders successfully!",
-                type: "warning",
-                insert: "top",
-                container: "top-right",
-                animationIn: ["animate__animated", "animate__fadeIn"],
-                animationOut: ["animate__animated", "animate__fadeOut"],
-                dismiss: {
-                    duration: 1000,
-                    onScreen: true
-                }
-            });
-        }
-        else {
-            Store.addNotification({
-                title: "Failure!!",
-                message: "You delete all orders unsuccessfully!",
-                type: "danger",
-                insert: "top",
-                container: "top-right",
-                animationIn: ["animate__animated", "animate__fadeIn"],
-                animationOut: ["animate__animated", "animate__fadeOut"],
-                dismiss: {
-                    duration: 1000,
-                    onScreen: true
-                }
-            });
-        }
-    }
+    
     useEffect(() => {
         cate_list();
         setType("order");
@@ -88,6 +40,95 @@ function OrderList() {
     const onDelete = () => {
         setDelStatus(true);
     }
+    const cate_list = async () => {
+        try {
+            const rs = await list_order(page);
+            setOrder(rs.data.order_list);
+            setDelStatus(false);
+            setTotalProducts(rs.data.total_product);
+            if (rs.status !== 200) {
+                console.log(rs.statusText)
+            }
+        } catch (err) {
+            if (err.response) {
+                console.log(err.response.status);
+            }
+        }
+    }
+
+    const delete_all = async () => {
+        try {
+            const res = await delete_order_all();
+            if (res.status === 200) {
+                Store.addNotification({
+                    title: "Warning!!",
+                    message: "You delete all orders successfully!",
+                    type: "warning",
+                    insert: "top",
+                    container: "top-right",
+                    animationIn: ["animate__animated", "animate__fadeIn"],
+                    animationOut: ["animate__animated", "animate__fadeOut"],
+                    dismiss: {
+                        duration: 1000,
+                        onScreen: true
+                    }
+                });
+            }
+            else if (res.status === 401 && res.data.message === "jwt expired") {
+                Store.addNotification({
+                    title: "Warning!!",
+                    message: "You can retry to delete all orders now!",
+                    type: "warning",
+                    insert: "top",
+                    container: "top-right",
+                    animationIn: ["animate__animated", "animate__fadeIn"],
+                    animationOut: ["animate__animated", "animate__fadeOut"],
+                    dismiss: {
+                        duration: 2000,
+                        onScreen: true
+                    }
+                });
+                try {
+                    const rs = await refreshAccessToken();
+                    if (rs.status !== 201) {
+                        Store.addNotification({
+                            title: "Failure!!",
+                            message: "You can't delete all orders right now!",
+                            type: "danger",
+                            insert: "top",
+                            container: "top-right",
+                            animationIn: ["animate__animated", "animate__fadeIn"],
+                            animationOut: ["animate__animated", "animate__fadeOut"],
+                            dismiss: {
+                                duration: 2000,
+                                onScreen: true
+                            }
+                        });
+                    }
+                } catch (error) {
+                    console.log(error);
+                }
+            } else {
+                Store.addNotification({
+                    title: "Failure!!",
+                    message: "You can't delete all orders right now!",
+                    type: "danger",
+                    insert: "top",
+                    container: "top-right",
+                    animationIn: ["animate__animated", "animate__fadeIn"],
+                    animationOut: ["animate__animated", "animate__fadeOut"],
+                    dismiss: {
+                        duration: 2000,
+                        onScreen: true
+                    }
+                });
+            }
+
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
     return (
         <div className="container order_list">
             <h2 className='caption'>
@@ -128,7 +169,8 @@ function OrderList() {
                     {order.map((item) => (
                         <tr key={item.order_id}>
                             <td><input type='checkbox' className='child' /></td>
-                            <td>{item.email}</td>
+                            <td>{item.email.split('@')[0]}@<br />
+                                {item.email.split('@')[1]}</td>
                             <td>
                                 {
                                     item.products.reduce((total, product) => total + product.price * product.quantity, 0)

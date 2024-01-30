@@ -2,7 +2,6 @@ import "../style/shop.css"
 import { Pagination } from "antd";
 import { Breadcrumb, Button } from "react-bootstrap";
 import { NavLink } from "react-router-dom";
-import Product_List from "../layout/product_list";
 function Shop() {
     document.title = "Shop";
     return (

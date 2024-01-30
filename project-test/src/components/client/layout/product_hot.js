@@ -1,15 +1,11 @@
 import "./../style/product_hot.css";
 import 'owl.carousel/dist/assets/owl.carousel.css';
 import 'owl.carousel/dist/assets/owl.theme.default.css';
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { ProgressBar } from "react-bootstrap";
-import { product_hot } from "../../../services/product_service";
-import { useEffect, useState } from "react";
 import { Cloudinary } from '@cloudinary/url-gen';
 import { AdvancedImage } from '@cloudinary/react';
-import { fill } from '@cloudinary/url-gen/actions/resize';
 function Product_Hot(props) {
-    const nav = useNavigate();
     const product = props.products;
     const cld = new Cloudinary({
         cloud: {

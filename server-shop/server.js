@@ -13,7 +13,7 @@ dotenv.config();
 
 app.use(Express.json({ limit: '10MB' }));
 app.use(Express.urlencoded({ extended: true, limit: "60mb" }));
-app.use(cors({ credentials: true, origin: ["http://localhost:3000", "https://admin-inky-mu.vercel.app/"] }));
+app.use(cors({ credentials: true, origin: ["http://localhost:3000", "http://localhost:3001"] }));
 app.use(cookieParser());
 
 app.use("/api/", router_auth);
@@ -22,7 +22,7 @@ app.use("/api/", router_product);
 app.use("/api/", router_category);
 
 
-mongoose.connect(process.env.URL_CLOUD)
+mongoose.connect(process.env.URL_DB)
     .then(() => {
         console.log("Connected to the database");
     })

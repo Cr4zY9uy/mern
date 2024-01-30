@@ -1,7 +1,7 @@
 import './App.css';
 import 'react-notifications-component/dist/theme.css'
 import Login from './components/admin/page/login';
-import { Route, Routes, useLocation } from 'react-router';
+import { Navigate, Route, Routes, useLocation } from 'react-router';
 import Admin from './components/admin/page/home';
 import EditOrder from './components/admin/page/editOrder';
 import AddProduct from './components/admin/page/addProduct';
@@ -20,7 +20,8 @@ import { AppProvider } from './context/app_context';
 import ProtectRouter from './functions/protect_router';
 function App() {
   const location = useLocation();
-  const hide = location.pathname === '/';
+  const hide = location.pathname === '/' || location.pathname.startsWith("/404");
+
   return (
     <>
       <div className='d-flex'>
@@ -30,7 +31,14 @@ function App() {
           <div className='d-flex flex-column wrap_main'>
             {!hide && <Header />}
             <Routes>
-              <Route path='/' element={<Login />} />
+              <Route
+                path="/"
+                element={JSON.parse(sessionStorage.getItem("isLog")) ? (
+                  <Navigate to="/admin" replace />
+                ) : (
+                  <Login />
+                )}
+              />
               <Route element={<ProtectRouter />}>
                 <Route path='/admin' element={<Admin />} />
                 <Route path='/product' element={<ProductList />} />
@@ -41,8 +49,8 @@ function App() {
                 <Route path='/product/edit/:id' element={<EditProduct />} />
                 <Route path='/category/edit/:id' element={<EditCategory />} />
                 <Route path='/order' element={<OrderList />} />
+                <Route path='/*' element={<PageNotFound />} />
               </Route>
-              <Route path='/*' element={<PageNotFound />} />
             </Routes>
             {!hide && <Copyright />}
           </div>

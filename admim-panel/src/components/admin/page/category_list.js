@@ -8,11 +8,12 @@ import { FormOutlined } from '@ant-design/icons';
 import { Cloudinary } from '@cloudinary/url-gen';
 import { fill } from '@cloudinary/url-gen/actions/resize';
 import { AdvancedImage } from '@cloudinary/react';
-import { delete_category_all, list_category, list_category_paginate } from '../../../services/category_service';
+import { delete_category_all, list_category_paginate } from '../../../services/category_service';
 import { useEffect, useState } from 'react';
 import { Store } from 'react-notifications-component';
 import DeleteModal from '../layout/modal_del';
 import { Pagination } from 'antd';
+import { refreshAccessToken } from '../../../services/user_service';
 function CategoryList() {
     document.title = "Category list";
 
@@ -31,46 +32,86 @@ function CategoryList() {
             setCategory(rs.data.category_list);
             setTotalProducts(rs.data.total_product);
             if (rs.status !== 200) {
-                console.log(rs.statusText)
+                console.log(rs.data.message)
             }
         } catch (err) {
             if (err.response) {
-                console.log(err.response.status);
+                console.log(err.response.message);
             }
         }
     }
     const delete_all = async () => {
-        const res = await delete_category_all();
-        if (res.status === 200) {
-            Store.addNotification({
-                title: "Warning!!",
-                message: "You delete all categories successfully!",
-                type: "warning",
-                insert: "top",
-                container: "top-right",
-                animationIn: ["animate__animated", "animate__fadeIn"],
-                animationOut: ["animate__animated", "animate__fadeOut"],
-                dismiss: {
-                    duration: 1500,
-                    onScreen: true
+        try {
+            const res = await delete_category_all();
+            if (res.status === 200) {
+                Store.addNotification({
+                    title: "Warning!!",
+                    message: "You delete all categories successfully!",
+                    type: "warning",
+                    insert: "top",
+                    container: "top-right",
+                    animationIn: ["animate__animated", "animate__fadeIn"],
+                    animationOut: ["animate__animated", "animate__fadeOut"],
+                    dismiss: {
+                        duration: 1500,
+                        onScreen: true
+                    }
+                });
+            }
+            else if (res.status === 401 && res.data.message === "jwt expired") {
+                Store.addNotification({
+                    title: "Warning!!",
+                    message: "You can retry to delete all categoriesy now!",
+                    type: "warning",
+                    insert: "top",
+                    container: "top-right",
+                    animationIn: ["animate__animated", "animate__fadeIn"],
+                    animationOut: ["animate__animated", "animate__fadeOut"],
+                    dismiss: {
+                        duration: 2000,
+                        onScreen: true
+                    }
+                });
+                try {
+                    const rs = await refreshAccessToken();
+                    if (rs.status !== 201) {
+                        Store.addNotification({
+                            title: "Failure!!",
+                            message: "You can't delete all categories right now!",
+                            type: "danger",
+                            insert: "top",
+                            container: "top-right",
+                            animationIn: ["animate__animated", "animate__fadeIn"],
+                            animationOut: ["animate__animated", "animate__fadeOut"],
+                            dismiss: {
+                                duration: 2000,
+                                onScreen: true
+                            }
+                        });
+                    }
+                } catch (error) {
+                    console.log(error);
                 }
-            });
+            } else {
+                Store.addNotification({
+                    title: "Failure!!",
+                    message: "You can't delete all categories right now!",
+                    type: "danger",
+                    insert: "top",
+                    container: "top-right",
+                    animationIn: ["animate__animated", "animate__fadeIn"],
+                    animationOut: ["animate__animated", "animate__fadeOut"],
+                    dismiss: {
+                        duration: 2000,
+                        onScreen: true
+                    }
+                });
+            }
+
+        } catch (error) {
+            console.log(error);
         }
-        else {
-            Store.addNotification({
-                title: "Failure!!",
-                message: "You delete all categories unsuccessfully!",
-                type: "danger",
-                insert: "top",
-                container: "top-right",
-                animationIn: ["animate__animated", "animate__fadeIn"],
-                animationOut: ["animate__animated", "animate__fadeOut"],
-                dismiss: {
-                    duration: 1500,
-                    onScreen: true
-                }
-            });
-        }
+
     }
     useEffect(() => {
         cate_list();

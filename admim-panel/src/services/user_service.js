@@ -8,7 +8,7 @@ export const login = async (user) => {
         return rs;
     }
     catch (error) {
-        return {};
+        return error.response;
     }
 }
 export const logout = async () => {
@@ -18,27 +18,27 @@ export const logout = async () => {
         return rs;
     }
     catch (error) {
-        return {};
+        return error.response;
+    }
+}
+export const refreshAccessToken = async () => {
+    const url = URL.USER.REFRESH_ACCESS_TOKEN;
+    try {
+        const rs = await api.post(url);
+        return rs;
+    } catch (error) {
+        return error.response;
     }
 }
 export const refreshToken = async () => {
     const url = URL.USER.REFRESH_TOKEN;
     try {
-        const rs = await api.post(url, {
-            refreshToken: JSON.parse(localStorage.getItem("user")).jwt.refresh_token
-        });
-        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-        currentUser.jwt.access_token = rs.data.accessToken;
-        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+        const rs = await api.post(url);
+        return rs;
+
     } catch (error) {
-        console.error('Refresh token failed:', error.message);
+        return error.response;
     }
 }
-function scheduleTokenRefresh() {
-    const refreshInterval = 5 * 60 * 1000;
-    refreshToken();
-    setInterval(refreshToken, refreshInterval);
-}
-if (JSON.parse(localStorage?.getItem("user"))?.jwt?.access_token) {
-    scheduleTokenRefresh();
-}
+
+

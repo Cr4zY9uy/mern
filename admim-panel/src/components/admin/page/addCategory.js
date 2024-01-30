@@ -12,9 +12,11 @@ import {
     Space
 } from 'antd';
 import { Store } from 'react-notifications-component';
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router";
 import { add_category } from "../../../services/category_service";
+import { refreshAccessToken } from "../../../services/user_service";
+
 function AddCategory() {
     const navigate = useNavigate();
     const [data, setData] = useState({});
@@ -34,47 +36,6 @@ function AddCategory() {
     const handleInput = (e) => {
         setData({ ...data, [e.target.name]: e.target.value });
     }
-    const handleSubmit = async () => {
-        try {
-            const res = await add_category({ ...data, image });
-            if (res.status === 201) {
-                Store.addNotification({
-                    title: "Sucess!!",
-                    message: "You add a category successfully!",
-                    type: "success",
-                    insert: "top",
-                    container: "top-center",
-                    animationIn: ["animate__animated", "animate__fadeIn"],
-                    animationOut: ["animate__animated", "animate__fadeOut"],
-                    dismiss: {
-                        duration: 2000,
-                        onScreen: true
-                    }
-                });
-                navigate("/category")
-            }
-            else {
-                Store.addNotification({
-                    title: "Failure!!",
-                    message: "You add a category unsuccessfully!",
-                    type: "danger",
-                    insert: "top",
-                    container: "top-center",
-                    animationIn: ["animate__animated", "animate__fadeIn"],
-                    animationOut: ["animate__animated", "animate__fadeOut"],
-                    dismiss: {
-                        duration: 2000,
-                        onScreen: true
-                    }
-                });
-            }
-
-
-        } catch (error) {
-            console.log(error.message);
-        }
-
-    };
 
     const normFile = (e) => {
         if (Array.isArray(e)) {
@@ -90,6 +51,86 @@ function AddCategory() {
         };
         reader.readAsDataURL(file);
         return false;
+    };
+
+    const handleSubmit = async () => {
+        try {
+            const res = await add_category({ ...data, image });
+            if (res.status === 201) {
+                Store.addNotification({
+                    title: "Sucess!!",
+                    message: "You add a category successfully!",
+                    type: "success",
+                    insert: "top",
+                    container: "top-right",
+                    animationIn: ["animate__animated", "animate__fadeIn"],
+                    animationOut: ["animate__animated", "animate__fadeOut"],
+                    dismiss: {
+                        duration: 2000,
+                        onScreen: true
+                    }
+                });
+                navigate("/category");
+            }
+            else if (res.status === 401 && res.data.message === "jwt expired") {
+                console.log("fetched");
+                Store.addNotification({
+                    title: "Warning!!",
+                    message: "You can retry to add a category now!",
+                    type: "warning",
+                    insert: "top",
+                    container: "top-right",
+                    animationIn: ["animate__animated", "animate__fadeIn"],
+                    animationOut: ["animate__animated", "animate__fadeOut"],
+                    dismiss: {
+                        duration: 2000,
+                        onScreen: true
+                    }
+                });
+                try {
+                    const rs = await refreshAccessToken();
+                    if (rs.status !== 201) {
+                        console.log("ferch11");
+                        Store.addNotification({
+                            title: "Failure!!",
+                            message: "You can't add a category right now!",
+                            type: "danger",
+                            insert: "top",
+                            container: "top-right",
+                            animationIn: ["animate__animated", "animate__fadeIn"],
+                            animationOut: ["animate__animated", "animate__fadeOut"],
+                            dismiss: {
+                                duration: 2000,
+                                onScreen: true
+                            }
+                        });
+                        navigate("/category");
+                    }
+                } catch (error) {
+                    console.log(error);
+                }
+            } else {
+                console.log("ferch12221");
+                Store.addNotification({
+                    title: "Failure!!",
+                    message: "You can't add a category right now!",
+                    type: "danger",
+                    insert: "top",
+                    container: "top-right",
+                    animationIn: ["animate__animated", "animate__fadeIn"],
+                    animationOut: ["animate__animated", "animate__fadeOut"],
+                    dismiss: {
+                        duration: 2000,
+                        onScreen: true
+                    }
+                });
+                navigate("/category");
+            }
+
+        } catch (error) {
+            console.log(error);
+        }
+
     };
 
     return (

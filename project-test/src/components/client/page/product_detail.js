@@ -11,7 +11,7 @@ import Banner_Big from "../layout/banner_big";
 import { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import CART_ACTION from "../../../redux/cart/cart_action";
-import { product_by_cate, product_by_code, product_detail, product_hot } from "../../../services/product_service";
+import { product_by_cate, product_detail, product_hot } from "../../../services/product_service";
 import { Cloudinary } from '@cloudinary/url-gen';
 import { AdvancedImage } from '@cloudinary/react';
 import { Store } from "react-notifications-component";
@@ -37,6 +37,9 @@ function ProductDetail(props) {
 
     const plus = () => {
         setQuantity((prevQuantity) => prevQuantity + 1);
+        if (quantity >= product.qty - 1) {
+            setQuantity(product.qty);
+        }
     }
     const items = [
         {
@@ -146,7 +149,7 @@ function ProductDetail(props) {
                             }
                         </div>
                     </div>
-                    <div className="d-flex flex-column align-items-center">
+                    <div className="d-flex flex-column align-items-center wrap_detail_sum">
                         <div className="d-flex">
                             <div className="img-product">
                                 <AdvancedImage cldImg={cld.image(product.thumbnail)} />
@@ -177,11 +180,11 @@ function ProductDetail(props) {
 
                                         </div>
                                     </div>
-                                    <Button variant="warning" style={{ width: "37.5%", height: "10vh", marginTop: 15 }} disabled={product.qty === 0 ? true : false} onClick={addToCart}> Add to cart</Button>
+                                    <Button variant="warning" style={{ width: "43%", height: "10vh", marginTop: 15 }} disabled={product.qty === 0 ? true : false} onClick={addToCart}> Add to cart</Button>
                                 </div>
                             </div>
                         </div>
-                        <Tabs defaultActiveKey="1" items={items} style={{width:"70%",marginLeft:60}}/>
+                        <Tabs defaultActiveKey="1" items={items} style={{ width: "70%", marginLeft: 60 }} />
                     </div>
                 </div>
                 <div className="product_relate-list ">

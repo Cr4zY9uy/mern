@@ -1,11 +1,11 @@
 const URL = {
     PRODUCT: {
         PAGINATE: 'product_paginate',
-        BYCODE: 'product_by_id/',
-        BYNAME: 'product_by_name/',
+        BYCODE: 'product/code/',
+        BYNAME: 'product/name/',
         HOT: 'product/hot',
         BYCATE: 'product/category/',
-        DETAIL: 'product/detail/'
+        DETAIL: 'product_detail/'
     },
     CATEGORY: {
         ALL: 'category'

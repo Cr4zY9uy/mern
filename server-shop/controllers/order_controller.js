@@ -14,6 +14,7 @@ export const add_order = async (req, res) => {
         return res.status(500).json({ message: error.message });
     }
 }
+
 export const edit_order = async (req, res) => {
     const order_id = req.params.id;
     const data = req.body;
@@ -116,6 +117,7 @@ export const delete_order_all = async (req, res) => {
         return res.status(500).json({ message: error.message });
     }
 }
+
 export const delete_order_list = async (req, res) => {
     try {
         const order_id = req.body.order_id;
@@ -133,11 +135,11 @@ export const delete_order_list = async (req, res) => {
         return res.status(500).json({ message: error.message });
     }
 };
+
 export const paginate_order = async (req, res) => {
     const limit = 9;
     const page = parseInt(req.query.page) ? parseInt(req.query.page) : 1;
     const skip = (page - 1) * limit;
-    console.log(page);
     try {
         const dataAll = await order_model.find().sort({ createdAt: -1 });
         const data = dataAll.slice(skip, skip + limit);
@@ -172,6 +174,7 @@ export const paginate_order = async (req, res) => {
         return res.status(500).json({ message: error.message });
     }
 }
+
 export const all_order = async (req, res) => {
 
     try {

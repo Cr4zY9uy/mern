@@ -8,7 +8,7 @@ export const list_category = async () => {
         return rs;
     }
     catch (error) {
-        return {};
+        return error.response;
     }
 }
 export const list_category_paginate = async (page) => {
@@ -18,7 +18,7 @@ export const list_category_paginate = async (page) => {
         return rs;
     }
     catch (error) {
-        return {};
+        return error.response;
     }
 }
 export const detail_category = async (id) => {
@@ -28,7 +28,7 @@ export const detail_category = async (id) => {
         return rs;
     }
     catch (error) {
-        return {};
+        return error.response;
     }
 }
 
@@ -39,7 +39,7 @@ export const add_category = async (category) => {
         return rs;
     }
     catch (error) {
-        return {};
+        return error.response;
     }
 }
 export const edit_category = async (id, category) => {
@@ -49,7 +49,7 @@ export const edit_category = async (id, category) => {
         return rs;
     }
     catch (error) {
-        return {};
+        return error.response;
     }
 }
 export const delete_category_id = async (id) => {
@@ -59,7 +59,7 @@ export const delete_category_id = async (id) => {
         return rs;
     }
     catch (error) {
-        return {};
+        return error.response;
     }
 }
 export const delete_category_all = async () => {
@@ -69,7 +69,7 @@ export const delete_category_all = async () => {
         return rs;
     }
     catch (error) {
-        return {};
+        return error.response;
     }
 }
 export const delete_category_list = async () => {
@@ -79,7 +79,7 @@ export const delete_category_list = async () => {
         return rs;
     }
     catch (error) {
-        return {};
+        return error.response;
 
     }
 }

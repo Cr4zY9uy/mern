@@ -13,6 +13,7 @@
     "axios": "^1.6.5",
     "react": "^18.2.0",
     "react-bootstrap": "^2.9.2",
+    "react-devtools": "^5.0.0",
     "react-dom": "^18.2.0",
     "react-notifications-component": "^4.0.1",
     "react-redux": "^9.0.4",

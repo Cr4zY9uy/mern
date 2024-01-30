@@ -1,31 +1,38 @@
-import { useContext, useState } from "react";
+import { useState } from "react";
 import "./../style/login.css";
 import { Button, FloatingLabel, Form } from "react-bootstrap";
 import { useNavigate } from "react-router";
 import { login } from "../../../services/user_service";
 import USER_ACTION from "../../../redux/user/user_action";
 import { connect } from "react-redux";
-import { AppContext } from "../../../context/app_context";
 import { Store } from "react-notifications-component";
 function Login(props) {
     const [info, setInfo] = useState({});
-    const { isLog, setIsLog } = useContext(AppContext)
     const navigate = useNavigate();
+    if (typeof JSON.parse(sessionStorage.getItem("isLog")) !== 'boolean') {
+        sessionStorage.setItem("isLog", false)
+    } else {
+        if (JSON.parse(sessionStorage.getItem("isLog")) === true) {
+            sessionStorage.setItem("isLog", true)
+
+        }
+    }
+
     const hanldeInput = (e) => {
         setInfo({ ...info, [e.target.name]: e.target.value });
     }
+
     const hanldeLogin = async (e) => {
         e.preventDefault();
         try {
             const rs = await login(info);
             if (rs.status !== 200) {
-                setIsLog(isLog);
                 Store.addNotification({
                     title: "Failure!!",
                     message: "You login unsuccessfully!",
                     type: "danger",
                     insert: "top",
-                    container: "top-center",
+                    container: "top-right",
                     animationIn: ["animate__animated", "animate__fadeIn"],
                     animationOut: ["animate__animated", "animate__fadeOut"],
                     dismiss: {
@@ -36,13 +43,13 @@ function Login(props) {
             }
             else {
                 props.login(rs.data);
-                setIsLog(!isLog);
+                sessionStorage.setItem("isLog", true)
                 Store.addNotification({
                     title: "Sucess!!",
                     message: "You login successfully!",
                     type: "success",
                     insert: "top",
-                    container: "top-center",
+                    container: "top-right",
                     animationIn: ["animate__animated", "animate__fadeIn"],
                     animationOut: ["animate__animated", "animate__fadeOut"],
                     dismiss: {
@@ -50,7 +57,9 @@ function Login(props) {
                         onScreen: true
                     }
                 });
+
                 navigate("/admin");
+
             }
         } catch (error) {
             alert(error.message);

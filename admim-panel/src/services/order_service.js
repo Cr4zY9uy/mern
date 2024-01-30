@@ -8,7 +8,7 @@ export const list_order = async (page) => {
         return rs;
     }
     catch (error) {
-        return {};
+        return error.response;
 
     }
 }
@@ -19,7 +19,7 @@ export const detail_order = async (id) => {
         return rs;
     }
     catch (error) {
-        return {};
+        return error.response;
     }
 }
 
@@ -30,7 +30,7 @@ export const edit_order = async (id, order) => {
         return rs;
     }
     catch (error) {
-        return {};
+        return error.response;
     }
 
 }
@@ -41,7 +41,7 @@ export const delete_order_id = async (id) => {
         return rs;
     }
     catch (error) {
-        return {};
+        return error.response;
     }
 
 }
@@ -52,7 +52,7 @@ export const delete_order_all = async () => {
         return rs;
     }
     catch (error) {
-        return {};
+        return error.response;
     }
 
 }
@@ -64,7 +64,7 @@ export const delete_order_list = async () => {
         return rs;
     }
     catch (error) {
-        return {};
+        return error.response;
 
     }
 }

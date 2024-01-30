@@ -8,7 +8,8 @@ export const add_order = async (order) => {
         return rs;
     }
     catch (error) {
-        return {};
+        return error.response;
+
     }
 }
 

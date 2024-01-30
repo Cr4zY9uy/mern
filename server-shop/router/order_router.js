@@ -15,7 +15,7 @@ import { checkAuth } from "../middleware/check_auth.js";
 const router = Router();
 
 
-router.post("/order/add", checkAuth, add_order_validator, add_order);
+router.post("/order/add", add_order_validator, add_order);
 
 router.put("/order/edit/:id", checkAuth, edit_order_validator, edit_order);
 

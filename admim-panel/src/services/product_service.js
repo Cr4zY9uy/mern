@@ -7,7 +7,7 @@ export const paginate_product = async (page) => {
         return rs;
     }
     catch (error) {
-        return {};
+        return error.response;
     }
 }
 export const detail_product_code = async (id) => {
@@ -17,7 +17,7 @@ export const detail_product_code = async (id) => {
         return rs;
     }
     catch (error) {
-        return {};
+        return error.response;
 
     }
 }
@@ -28,7 +28,7 @@ export const detail_product_name = async (name) => {
         return rs;
     }
     catch (error) {
-        return {};
+        return error.response;
 
     }
 }
@@ -39,7 +39,7 @@ export const add_product = async (product) => {
         return rs;
     }
     catch (error) {
-        return {};
+        return error.response;
     }
 }
 export const edit_product = async (id, product) => {
@@ -49,7 +49,7 @@ export const edit_product = async (id, product) => {
         return rs;
     }
     catch (error) {
-        return {};
+        return error.response;
     }
 }
 export const delete_product_id = async (id) => {
@@ -59,7 +59,7 @@ export const delete_product_id = async (id) => {
         return rs;
     }
     catch (error) {
-        return {};
+        return error.response;
 
     }
 }
@@ -70,7 +70,7 @@ export const delete_product_all = async () => {
         return rs;
     }
     catch (error) {
-        return {};
+        return error.response;
 
     }
 }
@@ -81,7 +81,7 @@ export const delete_product_list = async () => {
         return rs;
     }
     catch (error) {
-        return {};
+        return error.response;
 
     }
 }

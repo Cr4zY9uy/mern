@@ -21,6 +21,7 @@ import convertToDate from "../../../functions/convertDate";
 import { Cloudinary } from "@cloudinary/url-gen";
 import { AdvancedImage } from '@cloudinary/react';
 import { fill } from '@cloudinary/url-gen/actions/resize';
+import { refreshAccessToken } from "../../../services/user_service";
 function EditOrder() {
     const [data, setData] = useState({});
     const { id } = useParams();
@@ -35,9 +36,57 @@ function EditOrder() {
             cloudName: 'dv7ni8uod'
         }
     });
+
+    const formItemLayout = {
+        labelCol: {
+            xs: { span: 30 },
+            sm: { span: 6 },
+        },
+        wrapperCol: {
+            xs: { span: 24 },
+            sm: { span: 14 },
+        },
+    };
+
+
+    useEffect(() => {
+        if (order) {
+            form.setFieldValue("first_name", order.first_name)
+            form.setFieldValue("last_name", order.last_name)
+            form.setFieldValue("phone", order.phone)
+            form.setFieldValue("email", order.email)
+            form.setFieldValue("address", order.address)
+            form.setFieldValue("country", order.country)
+            form.setFieldValue("order_status", order.order_status)
+            form.setFieldValue("shipping_status", order.shipping_status)
+            form.setFieldValue("payment_status", order.payment_status)
+            form.setFieldValue("shipping_method", order.shipping_method)
+            form.setFieldValue("payment_method", order.payment_method)
+            form.setFieldValue("createdAt", order.createdAt)
+            form.setFieldValue("shipping_cost", order.shipping_cost)
+            form.setFieldValue("discount", order.discount)
+            form.setFieldValue("other_fee", order.other_fee)
+            form.setFieldValue("received", order.received)
+            form.setFieldValue("balance", order.balance)
+            form.setFieldValue("note", order.note)
+        }
+    }, [order])
+
+
+    const title = `Edit order ${order.order_id} created at ${convertToDate(order.createdAt)}`;
+
+    const handleInput = (e) => {
+        setData({ ...data, [e.target.name]: e.target.value });
+    }
+
+    const handleSelection = (name, value) => {
+        setSelection({ ...selection, [name]: value });
+    }
+
     const changeHandler = name => value => {
         setData({ ...data, [name]: value });
     };
+
     const load_order = async () => {
 
         try {
@@ -74,15 +123,8 @@ function EditOrder() {
     useEffect(() => {
         load_order();
     }, [])
-    const handleInput = (e) => {
-        setData({ ...data, [e.target.name]: e.target.value });
-    }
-    const handleSelection = (name, value) => {
-        setSelection({ ...selection, [name]: value });
-    }
-    useEffect(() => {
-        console.log({ ...data, ...selection });
-    }, [data, selection])
+
+
     const handleSubmit = async (e) => {
 
         try {
@@ -103,13 +145,14 @@ function EditOrder() {
                 });
                 navigate("/order")
             }
-            else {
+            else if (res.status === 401 && res.data.message === "jwt expired") {
+                console.log("fetched");
                 Store.addNotification({
-                    title: "Failure!!",
-                    message: "You edit an order unsuccessfully!",
-                    type: "danger",
+                    title: "Warning!!",
+                    message: "You can retry to edit a order now!",
+                    type: "warning",
                     insert: "top",
-                    container: "top-center",
+                    container: "top-right",
                     animationIn: ["animate__animated", "animate__fadeIn"],
                     animationOut: ["animate__animated", "animate__fadeOut"],
                     dismiss: {
@@ -117,46 +160,52 @@ function EditOrder() {
                         onScreen: true
                     }
                 });
+                try {
+                    const rs = await refreshAccessToken();
+                    if (rs.status !== 201) {
+                        console.log("ferch11");
+                        Store.addNotification({
+                            title: "Failure!!",
+                            message: "You can't edit a order right now!",
+                            type: "danger",
+                            insert: "top",
+                            container: "top-right",
+                            animationIn: ["animate__animated", "animate__fadeIn"],
+                            animationOut: ["animate__animated", "animate__fadeOut"],
+                            dismiss: {
+                                duration: 2000,
+                                onScreen: true
+                            }
+                        });
+                        navigate("/order");
+                    }
+                } catch (error) {
+                    console.log(error);
+                }
+            } else {
+                console.log("ferch12221");
+                Store.addNotification({
+                    title: "Failure!!",
+                    message: "You can't edit a order right now!",
+                    type: "danger",
+                    insert: "top",
+                    container: "top-right",
+                    animationIn: ["animate__animated", "animate__fadeIn"],
+                    animationOut: ["animate__animated", "animate__fadeOut"],
+                    dismiss: {
+                        duration: 2000,
+                        onScreen: true
+                    }
+                });
+                navigate("/order");
             }
+
         } catch (error) {
-            console.log(error.message);
+            console.log(error);
         }
 
     };
-    useEffect(() => {
-        if (order) {
-            form.setFieldValue("first_name", order.first_name)
-            form.setFieldValue("last_name", order.last_name)
-            form.setFieldValue("phone", order.phone)
-            form.setFieldValue("email", order.email)
-            form.setFieldValue("address", order.address)
-            form.setFieldValue("country", order.country)
-            form.setFieldValue("order_status", order.order_status)
-            form.setFieldValue("shipping_status", order.shipping_status)
-            form.setFieldValue("payment_status", order.payment_status)
-            form.setFieldValue("shipping_method", order.shipping_method)
-            form.setFieldValue("payment_method", order.payment_method)
-            form.setFieldValue("createdAt", order.createdAt)
-            form.setFieldValue("shipping_cost", order.shipping_cost)
-            form.setFieldValue("discount", order.discount)
-            form.setFieldValue("other_fee", order.other_fee)
-            form.setFieldValue("received", order.received)
-            form.setFieldValue("balance", order.balance)
-            form.setFieldValue("note", order.note)
-        }
-    }, [order])
 
-    const formItemLayout = {
-        labelCol: {
-            xs: { span: 30 },
-            sm: { span: 6 },
-        },
-        wrapperCol: {
-            xs: { span: 24 },
-            sm: { span: 14 },
-        },
-    };
-    const title = `Edit order ${order.order_id} created at ${convertToDate(order.createdAt)}`;
     return (
         <div className="edit_order_panel container">
             <h2 className='caption'><FormOutlined />Edit order</h2>

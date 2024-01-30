@@ -16,6 +16,7 @@ import Blog_Page from './components/client/page/blog';
 import Category from './components/client/page/category';
 import ScrollToTop from 'react-scroll-to-top';
 import { ReactNotifications } from 'react-notifications-component';
+import PageNotFound from './components/client/page/404notfound';
 function App() {
   return (
     <>
@@ -32,6 +33,7 @@ function App() {
         <Route path='/order_success' element={<Order_Success />} />
         <Route path='/blog' element={<Blog_Page />} />
         <Route path='/category/:name' element={<Category />} />
+        <Route path='/*' element={<PageNotFound />} />
       </Routes>
       <ScrollToTop smooth />
       <Footer />

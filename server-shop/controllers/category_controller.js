@@ -5,7 +5,6 @@ export const add_category = async (req, res) => {
     try {
 
         const data = req.body;
-        console.log(data);
         const checkExistId = await category_model.findOne({ category_id: data.category_id });
         if (checkExistId != null) {
             return res.status(400).json({ messsage: "Category id is existed" });
@@ -31,6 +30,7 @@ export const add_category = async (req, res) => {
         return res.status(500).json({ message: error.message });
     }
 }
+
 export const edit_category = async (req, res) => {
     try {
         const category_id = req.params.id;
@@ -110,6 +110,7 @@ export const delete_category_all = async (req, res) => {
         return res.status(500).json({ message: error.message });
     }
 }
+
 export const delete_category_list = async (req, res) => {
     try {
         const category_id = req.body.category_id;
@@ -127,6 +128,7 @@ export const delete_category_list = async (req, res) => {
         return res.status(500).json({ message: error.message });
     }
 };
+
 export const paginate_category = async (req, res) => {
     const limit = 6;
     const page = parseInt(req.query.page) ? parseInt(req.query.page) : 1;
@@ -152,6 +154,7 @@ export const paginate_category = async (req, res) => {
         return res.status(500).json({ message: error.message });
     }
 }
+
 export const all_category = async (req, res) => {
 
     try {

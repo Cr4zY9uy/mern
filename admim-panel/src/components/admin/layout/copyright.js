@@ -10,7 +10,7 @@ function Copyright() {
                 Powered by Anh Nguyen
             </div>
             <div>
-                Link Github
+                <a href="https://github.com/Cr4zY9uy/mern" target="_blank">Link Github</a>
             </div>
         </Footer>
     );

@@ -23,6 +23,7 @@ const URL = {
     USER: {
         LOGIN: 'login',
         REGISTER: 'register',
+        REFRESH_ACCESS_TOKEN: 'refresh_access_token',
         REFRESH_TOKEN: 'refresh_token',
         LOGOUT: 'logout'
     },
@@ -32,7 +33,7 @@ const URL = {
         DETAIL: 'order_detail/',
         EDIT: 'order/edit/',
         DELETE_ID: 'order/delete/',
-        DELETE_ALL: 'order//delete_all',
+        DELETE_ALL: 'order/delete_all',
         DELETE_LIST: 'order/delete_list'
 
     }

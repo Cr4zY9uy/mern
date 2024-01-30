@@ -7,7 +7,8 @@ export const paginate_product = async (page) => {
         return rs;
     }
     catch (error) {
-        return {};
+        return error.response;
+
     }
 }
 export const product_detail = async (id) => {
@@ -17,7 +18,8 @@ export const product_detail = async (id) => {
         return rs;
     }
     catch (error) {
-        return {};
+        return error.response;
+
     }
 }
 export const product_by_code = async (id, page) => {
@@ -27,7 +29,8 @@ export const product_by_code = async (id, page) => {
         return rs;
     }
     catch (error) {
-        return {};
+        return error.response;
+
     }
 }
 export const product_by_name = async (name, page) => {
@@ -37,7 +40,7 @@ export const product_by_name = async (name, page) => {
         return rs;
     }
     catch (error) {
-        return {};
+        return error.response;
     }
 }
 export const product_hot = async () => {
@@ -47,16 +50,16 @@ export const product_hot = async () => {
         return rs;
     }
     catch (error) {
-        return {};
+        return error.response;
     }
 }
-export const product_by_cate = async (name) => {
-    const url = URL.PRODUCT.BYCATE + name
+export const product_by_cate = async (name, page) => {
+    const url = URL.PRODUCT.BYCATE + name + "?page=" + page;
     try {
         const rs = await api.get(url);
         return rs;
     }
     catch (error) {
-        return {};
+        return error.response;
     }
 }

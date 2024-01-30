@@ -19,6 +19,7 @@ import { add_product } from "../../../services/product_service";
 import { useNavigate } from "react-router";
 import { Store } from 'react-notifications-component';
 import { list_category } from "../../../services/category_service";
+import { refreshAccessToken } from "../../../services/user_service";
 
 function AddProduct() {
     const { Option } = Select;
@@ -28,13 +29,8 @@ function AddProduct() {
     const [data, setData] = useState({ status: 0 });
     const [thumbnail, setThumbnail] = useState("");
     const [category_name, setCategoryName] = useState("");
-    const handleInput = (e) => {
+    const [category, setCategory] = useState([]);
 
-        setData({ ...data, [e.target.name]: e.target.value });
-    }
-    const changeHandler = name => value => {
-        setData({ ...data, [name]: value });
-    };
     const formItemLayout = {
         labelCol: {
             xs: { span: 30 },
@@ -45,68 +41,7 @@ function AddProduct() {
             sm: { span: 14 },
         },
     };
-    const [category, setCategory] = useState([]);
-    const cate_list = async () => {
-        try {
-            const rs = await list_category();
-            setCategory(rs.data.category_list);
-            if (rs.status !== 200) {
-                console.log(rs.statusText)
-            }
-        } catch (err) {
-            if (err.response) {
-                console.log(err.response.status);
-            }
-        }
-    }
 
-    useEffect(() => {
-        cate_list();
-    }, [])
-
-    const handleSubmit = async () => {
-        try {
-            const res = await add_product({ ...data, status, thumbnail, category_name });
-            if (res.status === 201) {
-                Store.addNotification({
-                    title: "Sucess!!",
-                    message: "You add a product successfully!",
-                    type: "success",
-                    insert: "top",
-                    container: "top-center",
-                    animationIn: ["animate__animated", "animate__fadeIn"],
-                    animationOut: ["animate__animated", "animate__fadeOut"],
-                    dismiss: {
-                        duration: 2000,
-                        onScreen: true
-                    }
-                });
-                navigate("/product")
-            }
-            else {
-                console.log(1022);
-                Store.addNotification({
-                    title: "Failure!!",
-                    message: "You add a product unsuccessfully!",
-                    type: "danger",
-                    insert: "top",
-                    container: "top-center",
-                    animationIn: ["animate__animated", "animate__fadeIn"],
-                    animationOut: ["animate__animated", "animate__fadeOut"],
-                    dismiss: {
-                        duration: 2000,
-                        onScreen: true
-                    }
-                });
-            }
-        } catch (error) {
-            console.log(error.message);
-        }
-
-    };
-    useEffect(() => {
-        console.log({ ...data, status, thumbnail, category_name })
-    }, [category_name])
     const handleImage = (file) => {
         const reader = new FileReader();
         reader.onload = (e) => {
@@ -123,6 +58,115 @@ function AddProduct() {
         }
         return e?.fileList;
     };
+    
+    const handleInput = (e) => {
+
+        setData({ ...data, [e.target.name]: e.target.value });
+    }
+    const changeHandler = name => value => {
+        setData({ ...data, [name]: value });
+    };
+
+    const cate_list = async () => {
+        try {
+            const rs = await list_category();
+            setCategory(rs.data.category_list);
+            if (rs.status !== 200) {
+                console.log(rs.status)
+            }
+        } catch (err) {
+            if (err.response) {
+                console.log(err.response);
+            }
+        }
+    }
+
+    useEffect(() => {
+        cate_list();
+        console.log(category);
+    }, [])
+
+    const handleSubmit = async () => {
+        try {
+            const res = await add_product({ ...data, status, thumbnail, category_name });
+            if (res.status === 201) {
+                Store.addNotification({
+                    title: "Sucess!!",
+                    message: "You add a product successfully!",
+                    type: "success",
+                    insert: "top",
+                    container: "top-right",
+                    animationIn: ["animate__animated", "animate__fadeIn"],
+                    animationOut: ["animate__animated", "animate__fadeOut"],
+                    dismiss: {
+                        duration: 2000,
+                        onScreen: true
+                    }
+                });
+                navigate("/product")
+            }
+            else if (res.status === 401 && res.data.message === "jwt expired") {
+                console.log("fetched");
+                Store.addNotification({
+                    title: "Warning!!",
+                    message: "You can retry to add a product now!",
+                    type: "warning",
+                    insert: "top",
+                    container: "top-right",
+                    animationIn: ["animate__animated", "animate__fadeIn"],
+                    animationOut: ["animate__animated", "animate__fadeOut"],
+                    dismiss: {
+                        duration: 2000,
+                        onScreen: true
+                    }
+                });
+                try {
+                    const rs = await refreshAccessToken();
+                    if (rs.status !== 201) {
+                        console.log("ferch11");
+                        Store.addNotification({
+                            title: "Failure!!",
+                            message: "You can't add a product right now!",
+                            type: "danger",
+                            insert: "top",
+                            container: "top-right",
+                            animationIn: ["animate__animated", "animate__fadeIn"],
+                            animationOut: ["animate__animated", "animate__fadeOut"],
+                            dismiss: {
+                                duration: 2000,
+                                onScreen: true
+                            }
+                        });
+                        navigate("/product");
+                    }
+                } catch (error) {
+                    console.log(error);
+                }
+            } else {
+                console.log("ferch12221");
+                Store.addNotification({
+                    title: "Failure!!",
+                    message: "You can't add a product right now!",
+                    type: "danger",
+                    insert: "top",
+                    container: "top-right",
+                    animationIn: ["animate__animated", "animate__fadeIn"],
+                    animationOut: ["animate__animated", "animate__fadeOut"],
+                    dismiss: {
+                        duration: 2000,
+                        onScreen: true
+                    }
+                });
+                navigate("/product");
+            }
+
+        } catch (error) {
+            console.log(error);
+        }
+
+
+    };
+
     return (
         <div className="add_product_panel container">
             <h2 className='caption'><PlusOutlined />Add new product</h2>
